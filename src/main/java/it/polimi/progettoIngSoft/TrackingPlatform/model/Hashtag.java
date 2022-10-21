@@ -18,7 +18,7 @@ public class Hashtag {
     private String text;
 
     @ManyToMany(mappedBy = "hashtags")
-    private List<Snapshot> snapshots;
+    private List<Snapshot> snapshots = null;
 
     public Hashtag() {
     }

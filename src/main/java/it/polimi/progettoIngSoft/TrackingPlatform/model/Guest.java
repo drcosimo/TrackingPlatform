@@ -23,10 +23,10 @@ public class Guest {
     @Column(nullable = false)
     private String surname;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -68,7 +68,7 @@ public class Guest {
     private List<Project> partecipatedProjects = null;
 
     @ManyToMany(mappedBy = "taggedGuests")
-    private List<Snapshot> snapshots;
+    private List<Snapshot> snapshots = null;
 
     public Guest() {
     }

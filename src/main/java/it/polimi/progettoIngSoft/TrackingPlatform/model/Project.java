@@ -32,19 +32,19 @@ public class Project {
     private boolean isPost;
 
     @OneToMany(mappedBy = "activityProject")
-    private List<Activity> activities;
+    private List<Activity> activities = null;
 
     @OneToMany(mappedBy = "snapshotProject")
-    private List<Snapshot> snapshots;
+    private List<Snapshot> snapshots = null;
 
     @ManyToMany(mappedBy = "partecipatedProjects")
-    private List<Guest> partecipants;
+    private List<Guest> partecipants = null;
 
     @ManyToMany(mappedBy = "createdProjects")
-    private List<Guest> creators;
+    private List<Guest> creators = null;
 
     @ManyToMany(mappedBy = "managedProjects")
-    private List<Guest> admins;
+    private List<Guest> admins = null;
 
     public Project() {
     }
