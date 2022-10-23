@@ -41,7 +41,7 @@ public class Snapshot {
             joinColumns = @JoinColumn(name = "snapshot_id"),
             inverseJoinColumns = @JoinColumn(name = "guest_id")
     )
-    private List<Guest> taggedGuests = null;
+    private List<GeneralGuest> taggedGuests = null;
 
     @ManyToOne
     @JoinColumn(name = "activity")
@@ -94,11 +94,11 @@ public class Snapshot {
         this.hashtags = hashtags;
     }
 
-    public List<Guest> getTaggedGuests() {
+    public List<GeneralGuest> getTaggedGuests() {
         return taggedGuests;
     }
 
-    public void setTaggedGuests(List<Guest> taggedGuests) {
+    public void setTaggedGuests(List<GeneralGuest> taggedGuests) {
         this.taggedGuests = taggedGuests;
     }
 

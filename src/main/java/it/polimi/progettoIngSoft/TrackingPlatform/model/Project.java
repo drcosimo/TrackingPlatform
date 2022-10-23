@@ -38,13 +38,13 @@ public class Project {
     private List<Snapshot> snapshots = null;
 
     @ManyToMany(mappedBy = "partecipatedProjects")
-    private List<Guest> partecipants = null;
+    private List<GeneralGuest> partecipants = null;
 
     @ManyToMany(mappedBy = "createdProjects")
-    private List<Guest> creators = null;
+    private List<GeneralGuest> creators = null;
 
     @ManyToMany(mappedBy = "managedProjects")
-    private List<Guest> admins = null;
+    private List<GeneralGuest> admins = null;
 
     public Project() {
     }
@@ -113,27 +113,27 @@ public class Project {
         this.snapshots = snapshots;
     }
 
-    public List<Guest> getPartecipants() {
+    public List<GeneralGuest> getPartecipants() {
         return partecipants;
     }
 
-    public void setPartecipants(List<Guest> partecipants) {
+    public void setPartecipants(List<GeneralGuest> partecipants) {
         this.partecipants = partecipants;
     }
 
-    public List<Guest> getCreators() {
+    public List<GeneralGuest> getCreators() {
         return creators;
     }
 
-    public void setCreators(List<Guest> creators) {
+    public void setCreators(List<GeneralGuest> creators) {
         this.creators = creators;
     }
 
-    public List<Guest> getAdmins() {
+    public List<GeneralGuest> getAdmins() {
         return admins;
     }
 
-    public void setAdmins(List<Guest> admins) {
+    public void setAdmins(List<GeneralGuest> admins) {
         this.admins = admins;
     }
 

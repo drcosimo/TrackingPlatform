@@ -3,13 +3,12 @@ package it.polimi.progettoIngSoft.TrackingPlatform.model;
 import javax.persistence.Entity;
 
 @Entity
-public class Guest extends GeneralGuest{
-
+public class Admin extends GeneralGuest{
     @Override
     public boolean isAdmin(){
-        return false;
+        return true;
     }
 
-    public Guest() {
+    public Admin() {
     }
 }
