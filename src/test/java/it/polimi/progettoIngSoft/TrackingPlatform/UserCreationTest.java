@@ -1,7 +1,7 @@
 package it.polimi.progettoIngSoft.TrackingPlatform;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.Admin;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.GeneralGuest;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.Guest;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.GeneralGuestRepository;
 import org.junit.jupiter.api.Assertions;
@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Instant;
 
 @SpringBootTest
-public class GeneralGuestCreationTest {
+public class UserCreationTest {
 
     @Autowired
     private GeneralGuestRepository guestRepository;
@@ -28,11 +28,11 @@ public class GeneralGuestCreationTest {
         newGuest.setSex("male");
         newGuest.setSurname("deca");
         newGuest.setUsername("niccodeca");
-        GeneralGuest generalGuest = guestRepository.saveAndFlush(newGuest);
-        System.out.println("guestId =" + generalGuest.getId());
-        generalGuest = guestRepository.findById(generalGuest.getId()).get();
-        Assertions.assertTrue(generalGuest instanceof Guest);
-        Assertions.assertFalse(generalGuest instanceof Admin);
+        User user = guestRepository.saveAndFlush(newGuest);
+        System.out.println("guestId =" + user.getId());
+        user = guestRepository.findById(user.getId()).get();
+        Assertions.assertTrue(user instanceof Guest);
+        Assertions.assertFalse(user instanceof Admin);
     }
 
     @Test
@@ -45,10 +45,10 @@ public class GeneralGuestCreationTest {
         newAdmin.setSex("male");
         newAdmin.setSurname("deca");
         newAdmin.setUsername("niccoAdmin");
-        GeneralGuest generalGuest = guestRepository.saveAndFlush(newAdmin);
-        System.out.println("guestId =" + generalGuest.getId());
-        generalGuest = guestRepository.findById(generalGuest.getId()).get();
-        Assertions.assertFalse(generalGuest instanceof Guest);
-        Assertions.assertTrue(generalGuest instanceof Admin);
+        User user = guestRepository.saveAndFlush(newAdmin);
+        System.out.println("guestId =" + user.getId());
+        user = guestRepository.findById(user.getId()).get();
+        Assertions.assertFalse(user instanceof Guest);
+        Assertions.assertTrue(user instanceof Admin);
     }
 }

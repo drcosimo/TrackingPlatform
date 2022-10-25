@@ -1,8 +1,7 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.service;
 
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Admin;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.GeneralGuestDto;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.GeneralGuest;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.Guest;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.GeneralGuestRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -26,14 +25,14 @@ public class GuestService {
                 && newGuest.getBirthDate().isBefore(Instant.now()) &&
                 Pattern.compile(regexPattern).matcher(newGuest.getEmail()).matches() && newGuest.getName().length() > 1 && newGuest.getSurname().length() > 1
                 && newGuest.getPassword().length() > 4 && newGuest.getUsername().length() > 1 && newGuest.getSex().length() > 2) {
-            GeneralGuest generalGuest = guestRepository.save(newGuest);
-            return new GeneralGuestDto(generalGuest.getId(), generalGuest.getName(), generalGuest.getSurname(), generalGuest.getUsername(), generalGuest.getEmail(), generalGuest.getBirthDate(), generalGuest.getSex(), false);
+            User user = guestRepository.save(newGuest);
+            return new GeneralGuestDto(user.getId(), user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getBirthDate(), user.getSex(), false);
         }
         else return null;
     }
 
     public GeneralGuestDto login(String email, String password) {
-        GeneralGuest generalGuest = guestRepository.getByEmailAndPassword(email, password);
-        return new GeneralGuestDto(generalGuest.getId(), generalGuest.getName(), generalGuest.getSurname(), generalGuest.getUsername(), generalGuest.getEmail(), generalGuest.getBirthDate(), generalGuest.getSex(), generalGuest.isAdmin());
+        User user = guestRepository.getByEmailAndPassword(email, password);
+        return new GeneralGuestDto(user.getId(), user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getBirthDate(), user.getSex(), user.isAdmin());
     }
 }

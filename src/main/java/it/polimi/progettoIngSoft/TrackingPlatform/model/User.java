@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Entity
-public abstract class GeneralGuest {
+public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
