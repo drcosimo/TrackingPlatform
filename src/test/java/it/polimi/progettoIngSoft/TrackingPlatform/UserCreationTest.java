@@ -3,7 +3,7 @@ package it.polimi.progettoIngSoft.TrackingPlatform;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.Admin;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.Guest;
-import it.polimi.progettoIngSoft.TrackingPlatform.repository.GeneralGuestRepository;
+import it.polimi.progettoIngSoft.TrackingPlatform.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +15,9 @@ import java.time.Instant;
 public class UserCreationTest {
 
     @Autowired
-    private GeneralGuestRepository guestRepository;
+    private UserRepository guestRepository;
 
-    //the following two tests check the correct registration in db of different GeneralGuest instances
+    //the following two tests check the correct registration in db of different User instances
     @Test
     public void generateGuestTest(){
         Guest newGuest = new Guest();

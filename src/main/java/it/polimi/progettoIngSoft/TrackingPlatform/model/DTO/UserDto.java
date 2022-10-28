@@ -1,8 +1,13 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.Admin;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
+
 import java.time.Instant;
 
-public class GeneralGuestDto {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UserDto {
     private Long id;
 
     private String name;
@@ -13,16 +18,31 @@ public class GeneralGuestDto {
 
     private String email;
 
+    private String password;
+
     private Instant birthDate;
 
     private String sex;
 
+    private String token;
+
     private boolean isAdmin;
 
-    public GeneralGuestDto() {
+    public UserDto() {
     }
 
-    public GeneralGuestDto(Long id, String name, String surname, String username, String email, Instant birthDate, String sex, boolean isAdmin) {
+    public UserDto (User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setName(user.getName());
+        userDto.setSurname(user.getSurname());
+        userDto.setUsername(user.getUsername());
+        userDto.setEmail(user.getEmail());
+        userDto.setBirthDate(user.getBirthDate());
+        userDto.setAdmin(user instanceof Admin);
+    }
+
+    public UserDto(Long id, String name, String surname, String username, String email, Instant birthDate, String sex, boolean isAdmin) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -87,6 +107,22 @@ public class GeneralGuestDto {
 
     public void setSex(String sex) {
         this.sex = sex;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public boolean isAdmin() {
