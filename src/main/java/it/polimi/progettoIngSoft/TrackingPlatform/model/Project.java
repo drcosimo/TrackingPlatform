@@ -32,19 +32,19 @@ public class Project {
     private boolean isPost;
 
     @OneToMany(mappedBy = "activityProject")
-    private List<Activity> activities = null;
+    private List<Activity> activities;
 
-    @OneToMany(mappedBy = "snapshotProject")
-    private List<Snapshot> snapshots = null;
+    @OneToMany(mappedBy = "project")
+    private List<ProjectImage> images;
 
     @ManyToMany(mappedBy = "partecipatedProjects")
-    private List<User> partecipants = null;
+    private List<User> partecipants;
 
     @ManyToMany(mappedBy = "createdProjects")
-    private List<User> creators = null;
+    private List<User> creators;
 
     @ManyToMany(mappedBy = "managedProjects")
-    private List<User> admins = null;
+    private List<User> admins;
 
     public Project() {
     }
@@ -103,14 +103,6 @@ public class Project {
 
     public void setActivities(List<Activity> activities) {
         this.activities = activities;
-    }
-
-    public List<Snapshot> getSnapshots() {
-        return snapshots;
-    }
-
-    public void setSnapshots(List<Snapshot> snapshots) {
-        this.snapshots = snapshots;
     }
 
     public List<User> getPartecipants() {

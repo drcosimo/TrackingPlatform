@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import java.time.Instant;
 import java.util.List;
 
@@ -66,6 +67,9 @@ public abstract class User {
 
     @ManyToMany(mappedBy = "taggedGuests")
     private List<Snapshot> snapshots = null;
+
+    @OneToMany(mappedBy = "user")
+    private List<SinglePost> singlePosts;
 
     public Long getId() {
         return id;
@@ -165,4 +169,11 @@ public abstract class User {
 
     public abstract boolean isAdmin();
 
+    public List<SinglePost> getSinglePosts() {
+        return singlePosts;
+    }
+
+    public void setSinglePosts(List<SinglePost> singlePosts) {
+        this.singlePosts = singlePosts;
+    }
 }
