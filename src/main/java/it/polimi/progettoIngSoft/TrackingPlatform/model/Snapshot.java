@@ -35,9 +35,17 @@ public abstract class Snapshot {
     @JoinTable(
             name = "guests_snapshots",
             joinColumns = @JoinColumn(name = "snapshot_id"),
-            inverseJoinColumns = @JoinColumn(name = "guest_id")
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> taggedGuests;
+
+    @ManyToMany
+    @JoinTable(
+            name = "snapshots_reactions",
+            joinColumns = @JoinColumn(name = "snapshot_id"),
+            inverseJoinColumns = @JoinColumn(name = "reaction_id")
+    )
+    private List<Reaction> reactions;
 
     public Long getId() {
         return id;
@@ -79,4 +87,11 @@ public abstract class Snapshot {
         this.taggedGuests = taggedGuests;
     }
 
+    public List<Reaction> getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(List<Reaction> reactions) {
+        this.reactions = reactions;
+    }
 }

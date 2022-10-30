@@ -42,7 +42,7 @@ public abstract class User {
     @ManyToMany
     @JoinTable(
             name = "creators_projects",
-            joinColumns = @JoinColumn(name = "guest_id"),
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id")
     )
     private List<Project> createdProjects = null;
@@ -51,7 +51,7 @@ public abstract class User {
     @ManyToMany
     @JoinTable(
             name = "admins_projects",
-            joinColumns = @JoinColumn(name = "guest_id"),
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id")
     )
     private List<Project> managedProjects = null;
@@ -60,7 +60,7 @@ public abstract class User {
     @ManyToMany
     @JoinTable(
             name = "partecipants_projects",
-            joinColumns = @JoinColumn(name = "guest_id"),
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id")
     )
     private List<Project> partecipatedProjects = null;
@@ -70,6 +70,9 @@ public abstract class User {
 
     @OneToMany(mappedBy = "user")
     private List<SinglePost> singlePosts;
+
+    @ManyToMany(mappedBy = "users")
+    private List<Reaction> reactions;
 
     public Long getId() {
         return id;
@@ -175,5 +178,13 @@ public abstract class User {
 
     public void setSinglePosts(List<SinglePost> singlePosts) {
         this.singlePosts = singlePosts;
+    }
+
+    public List<Reaction> getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(List<Reaction> reactions) {
+        this.reactions = reactions;
     }
 }
