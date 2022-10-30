@@ -129,4 +129,11 @@ public class Project {
         this.admins = admins;
     }
 
+    public List<ProjectImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProjectImage> images) {
+        this.images = images;
+    }
 }

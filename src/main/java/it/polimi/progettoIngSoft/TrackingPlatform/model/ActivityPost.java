@@ -11,4 +11,14 @@ public class ActivityPost extends Snapshot{
     @JoinColumn(name = "activity")
     private Activity activity;
 
+    public ActivityPost() {
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
 }

@@ -10,4 +10,15 @@ public class ProjectImage extends Snapshot{
     @ManyToOne
     @JoinColumn(name = "project")
     private Project project;
+
+    public ProjectImage() {
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
 }

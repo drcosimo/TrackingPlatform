@@ -86,4 +86,12 @@ public class Activity {
     public void setActivityProject(Project activityProject) {
         this.activityProject = activityProject;
     }
+
+    public List<ActivityPost> getActivityPosts() {
+        return activityPosts;
+    }
+
+    public void setActivityPosts(List<ActivityPost> activityPosts) {
+        this.activityPosts = activityPosts;
+    }
 }
