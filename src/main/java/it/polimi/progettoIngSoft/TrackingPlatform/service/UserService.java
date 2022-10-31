@@ -4,21 +4,32 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.LoginDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UserDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.Guest;
+import it.polimi.progettoIngSoft.TrackingPlatform.repository.TokenRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.UserRepository;
+import it.polimi.progettoIngSoft.TrackingPlatform.util.TokenGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.regex.Pattern;
 
 @Service
+@Transactional
 public class UserService {
 
     private final String regexPattern = "^(.+)@(\\S+)$";
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TokenRepository tokenRepository;
+
+    @Autowired
+    private TokenGenerator tokenGenerator;
 
     public UserDto register(UserDto userDto) {
         //check guest register fields not null or invalid
@@ -30,7 +41,10 @@ public class UserService {
                 User user = userRepository.save(
                         new Guest(userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getEmail(), userDto.getPassword(), userDto.getBirthDate(), userDto.getSex())
                 );
-                return new UserDto(user.getId(), user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getBirthDate(), user.getSex(), false);
+                LoginDto loginDto = new LoginDto();
+                loginDto.setEmail(user.getEmail());
+                loginDto.setPassword(user.getPassword());
+                return login(loginDto);
             }
             catch (Exception e){
                 System.out.println(e);
@@ -43,7 +57,9 @@ public class UserService {
     public UserDto login(LoginDto credentials) {
         User user = userRepository.getByEmailAndPassword(credentials.getEmail(), credentials.getPassword());
         if(user == null) return null;
-        else return new UserDto(user.getId(), user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getBirthDate(), user.getSex(), user.isAdmin());
+        else{
+            return new UserDto(user.getId(), user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getBirthDate(), user.getSex(), tokenGenerator.getUserToken(user).getToken(), user.isAdmin());
+        }
     }
 
 
