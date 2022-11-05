@@ -44,7 +44,7 @@ public class UserDto {
         userDto.setAdmin(user instanceof Admin);
     }
 
-    public UserDto(Long id, String name, String surname, String username, String email, Instant birthDate, String sex, boolean isAdmin) {
+    public UserDto(Long id, String name, String surname, String username, String email, Instant birthDate, String sex, String token, boolean isAdmin) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -52,6 +52,7 @@ public class UserDto {
         this.email = email;
         this.birthDate = birthDate;
         this.sex = sex;
+        this.token = token;
         this.isAdmin = isAdmin;
     }
 

@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.time.Instant;
 import java.util.List;
 
@@ -73,6 +74,9 @@ public abstract class User {
 
     @ManyToMany(mappedBy = "users")
     private List<Reaction> reactions;
+
+    @OneToOne(mappedBy = "user")
+    private Token token;
 
     public Long getId() {
         return id;
