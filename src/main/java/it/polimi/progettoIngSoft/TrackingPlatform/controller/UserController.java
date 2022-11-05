@@ -1,6 +1,7 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.controller;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.LoginDto;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ResetPasswordDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UserDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.service.UserService;
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +51,7 @@ public class UserController {
     }
 
     @PostMapping("/updateUserDetails")
-    public ResponseEntity<UserDto> updateUserDetails(UserDto userUpdate){
+    public ResponseEntity<UserDto> updateUserDetails(@RequestBody UserDto userUpdate){
         if(userUpdate != null){
              UserDto updateduser = userService.updateUserDetails(userUpdate);
              if(updateduser != null){
@@ -60,6 +61,21 @@ public class UserController {
                  );
              }
              else return ResponseEntity.badRequest().build();
+        }
+        else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<UserDto> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto){
+        if(resetPasswordDto != null){
+            UserDto userDto = userService.resetPassword(resetPasswordDto);
+            if(userDto != null){
+                return new ResponseEntity<>(
+                        userDto,
+                        HttpStatus.OK
+                );
+            }
+            else return ResponseEntity.badRequest().build();
         }
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }

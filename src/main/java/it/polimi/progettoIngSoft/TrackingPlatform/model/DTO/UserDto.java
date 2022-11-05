@@ -28,6 +28,8 @@ public class UserDto {
 
     private boolean isAdmin;
 
+    private String error;
+
     public UserDto() {
     }
 
@@ -131,5 +133,13 @@ public class UserDto {
 
     public void setAdmin(boolean admin) {
         isAdmin = admin;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }
