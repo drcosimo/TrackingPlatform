@@ -1,5 +1,6 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.controller;
 
+import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ChangeEmailDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.LoginDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ResetPasswordDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UserDto;
@@ -21,7 +22,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody UserDto userDto){
+    public ResponseEntity<UserDto> register(@RequestBody UserDto userDto) {
         //nullity parameter check
         if(userDto != null){
             UserDto returnDto = userService.register(userDto);
@@ -37,7 +38,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<UserDto> login(@RequestBody LoginDto credentials){
-        if(StringUtils.isNoneEmpty(credentials.getEmail(), credentials.getPassword())){
+        if(StringUtils.isNoneEmpty(credentials.getEmail(), credentials.getPassword())) {
             UserDto returnDto = userService.login(credentials);
             if(returnDto != null){
                 return new ResponseEntity<>(
@@ -51,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping("/updateUserDetails")
-    public ResponseEntity<UserDto> updateUserDetails(@RequestBody UserDto userUpdate){
+    public ResponseEntity<UserDto> updateUserDetails(@RequestBody UserDto userUpdate) {
         if(userUpdate != null){
              UserDto updateduser = userService.updateUserDetails(userUpdate);
              if(updateduser != null){
@@ -66,9 +67,24 @@ public class UserController {
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity<UserDto> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto){
+    public ResponseEntity<UserDto> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
         if(resetPasswordDto != null){
             UserDto userDto = userService.resetPassword(resetPasswordDto);
+            if(userDto != null){
+                return new ResponseEntity<>(
+                        userDto,
+                        HttpStatus.OK
+                );
+            }
+            else return ResponseEntity.badRequest().build();
+        }
+        else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @PostMapping("/changeEmail")
+    public ResponseEntity<UserDto> changeEmail(@RequestBody ChangeEmailDto changeEmailDto) {
+        if(changeEmailDto != null){
+            UserDto userDto = userService.changeEmail(changeEmailDto);
             if(userDto != null){
                 return new ResponseEntity<>(
                         userDto,

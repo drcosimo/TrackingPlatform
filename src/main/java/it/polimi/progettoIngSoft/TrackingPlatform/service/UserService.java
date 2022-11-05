@@ -1,5 +1,6 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.service;
 
+import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ChangeEmailDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.LoginDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ResetPasswordDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UserDto;
@@ -67,7 +68,7 @@ public class UserService {
     public UserDto updateUserDetails(UserDto userUpdate) {
         if(StringUtils.isNoneEmpty(userUpdate.getUsername(), userUpdate.getName(), userUpdate.getSex(), userUpdate.getSurname()) && userUpdate.getBirthDate().isAfter(Instant.now().minus(14, ChronoUnit.YEARS)) && userUpdate.getId() != null) {
             try {
-                User dbUser = userRepository.findById(userUpdate.getId()).get();
+                User dbUser = tokenRepository.findByToken(userUpdate.getToken()).getUser();
                 dbUser.setBirthDate(userUpdate.getBirthDate());
                 dbUser.setUsername(userUpdate.getUsername());
                 dbUser.setName(userUpdate.getName());
@@ -87,15 +88,39 @@ public class UserService {
     public UserDto resetPassword(ResetPasswordDto resetPasswordDto) {
         if(StringUtils.isNoneEmpty(resetPasswordDto.getNewPassword(), resetPasswordDto.getOldPassword(), resetPasswordDto.getToken())) {
             try {
-                User user = userRepository.findByToken(resetPasswordDto.getToken());
+                User user = tokenRepository.findByToken(resetPasswordDto.getToken()).getUser();
                 //check if the old password is valid
                 if(user != null && resetPasswordDto.getOldPassword().equals(user.getPassword()) && resetPasswordDto.getNewPassword().length() > 4) {
                     user.setPassword(resetPasswordDto.getNewPassword());
                     userRepository.save(user);
+                    return new UserDto(user);
                 }
                 else return null;
             }
             catch (Exception e) {
+                System.out.println(e);
+                return null;
+            }
+        }
+        else return null;
+    }
+
+
+    public UserDto changeEmail(ChangeEmailDto changeEmailDto) {
+        if(StringUtils.isNoneEmpty(changeEmailDto.getNewEmail(), changeEmailDto.getOldEmail(), changeEmailDto.getToken())) {
+            try {
+                User user = tokenRepository.findByToken(changeEmailDto.getToken()).getUser();
+                //check that the new email is not used in another account
+                User uniqueEmailTest = userRepository.findByEmail(changeEmailDto.getNewEmail());
+                if(user != null && uniqueEmailTest == null && user.getEmail().equals(changeEmailDto.getOldEmail()) && Pattern.compile(regexPattern).matcher(changeEmailDto.getNewEmail()).matches()) {
+                    user.setEmail(changeEmailDto.getNewEmail());
+                    userRepository.save(user);
+                    return new UserDto(user);
+                }
+                else return null;
+            }
+            catch (Exception e) {
+                System.out.println(e);
                 return null;
             }
         }
