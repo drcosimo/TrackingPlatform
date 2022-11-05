@@ -34,7 +34,7 @@ public class Activity {
     private Project activityProject;
 
     @OneToMany(mappedBy = "activity")
-    private List<Snapshot> snapshots = null;
+    private List<ActivityPost> activityPosts = null;
 
     public Activity() {
     }
@@ -79,19 +79,19 @@ public class Activity {
         this.endDate = endDate;
     }
 
-    public List<Snapshot> getSnapshots() {
-        return snapshots;
-    }
-
-    public void setSnapshots(List<Snapshot> snapshots) {
-        this.snapshots = snapshots;
-    }
-
     public Project getActivityProject() {
         return activityProject;
     }
 
     public void setActivityProject(Project activityProject) {
         this.activityProject = activityProject;
+    }
+
+    public List<ActivityPost> getActivityPosts() {
+        return activityPosts;
+    }
+
+    public void setActivityPosts(List<ActivityPost> activityPosts) {
+        this.activityPosts = activityPosts;
     }
 }

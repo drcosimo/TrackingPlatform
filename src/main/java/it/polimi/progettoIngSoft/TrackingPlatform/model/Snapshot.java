@@ -8,11 +8,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import java.util.List;
 
 @Entity
-public class Snapshot {
+public abstract class Snapshot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,36 +22,30 @@ public class Snapshot {
     @Column
     private String image;
 
-    @Column(nullable = false)
-    private boolean isPicture;
-
     @ManyToMany
     @JoinTable(
             name = "hashtag_snapshots",
             joinColumns = @JoinColumn(name = "snapshot_id"),
             inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
-    private List<Hashtag> hashtags = null;
+    private List<Hashtag> hashtags;
 
 
     @ManyToMany
     @JoinTable(
             name = "guests_snapshots",
             joinColumns = @JoinColumn(name = "snapshot_id"),
-            inverseJoinColumns = @JoinColumn(name = "guest_id")
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> taggedGuests = null;
+    private List<User> taggedGuests;
 
-    @ManyToOne
-    @JoinColumn(name = "activity")
-    private Activity activity = null;
-
-    @ManyToOne
-    @JoinColumn(name = "snapshotProject")
-    private Project snapshotProject = null;
-
-    public Snapshot() {
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "snapshots_reactions",
+            joinColumns = @JoinColumn(name = "snapshot_id"),
+            inverseJoinColumns = @JoinColumn(name = "reaction_id")
+    )
+    private List<Reaction> reactions;
 
     public Long getId() {
         return id;
@@ -78,14 +71,6 @@ public class Snapshot {
         this.image = image;
     }
 
-    public boolean isPicture() {
-        return isPicture;
-    }
-
-    public void setPicture(boolean picture) {
-        isPicture = picture;
-    }
-
     public List<Hashtag> getHashtags() {
         return hashtags;
     }
@@ -102,19 +87,11 @@ public class Snapshot {
         this.taggedGuests = taggedGuests;
     }
 
-    public Activity getActivity() {
-        return activity;
+    public List<Reaction> getReactions() {
+        return reactions;
     }
 
-    public void setActivity(Activity activity) {
-        this.activity = activity;
-    }
-
-    public Project getSnapshotProject() {
-        return snapshotProject;
-    }
-
-    public void setSnapshotProject(Project snapshotProject) {
-        this.snapshotProject = snapshotProject;
+    public void setReactions(List<Reaction> reactions) {
+        this.reactions = reactions;
     }
 }
