@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.Admin;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
 
-import java.time.Instant;
+import java.sql.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDto {
@@ -20,7 +20,7 @@ public class UserDto {
 
     private String password;
 
-    private Instant birthDate;
+    private Date birthDate;
 
     private String sex;
 
@@ -44,7 +44,7 @@ public class UserDto {
         userDto.setAdmin(user instanceof Admin);
     }
 
-    public UserDto(Long id, String name, String surname, String username, String email, Instant birthDate, String sex, String token, boolean isAdmin) {
+    public UserDto(Long id, String name, String surname, String username, String email, Date birthDate, String sex, String token, boolean isAdmin) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -96,11 +96,11 @@ public class UserDto {
         this.email = email;
     }
 
-    public Instant getBirthDate() {
+    public Date getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Instant birthDate) {
+    public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
 

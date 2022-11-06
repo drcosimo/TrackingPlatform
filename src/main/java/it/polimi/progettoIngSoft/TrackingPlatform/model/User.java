@@ -10,7 +10,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import java.time.Instant;
+import java.sql.Date;
 import java.util.List;
 
 @Entity
@@ -35,7 +35,7 @@ public abstract class User {
     private String password;
 
     @Column(nullable = false)
-    private Instant birthDate;
+    private Date birthDate;
 
     @Column(nullable = false)
     private String sex;
@@ -126,13 +126,22 @@ public abstract class User {
         this.password = password;
     }
 
-    public Instant getBirthDate() {
+    public Date getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(Instant birthDate) {
+    public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public void setToken(Token token) {
+        this.token = token;
+    }
+
 
     public String getSex() {
         return sex;

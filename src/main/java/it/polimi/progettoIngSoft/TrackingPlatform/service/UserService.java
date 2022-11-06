@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.regex.Pattern;
 
@@ -36,7 +36,7 @@ public class UserService {
     public UserDto register(UserDto userDto) {
         //check guest register fields not null or invalid
         if(StringUtils.isNoneEmpty(userDto.getEmail(), userDto.getPassword(), userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getSex())
-                && userDto.getBirthDate().isBefore(Instant.now().minus(14, ChronoUnit.YEARS)) &&
+                && userDto.getBirthDate().toLocalDate().isBefore(LocalDate.now().minus(14, ChronoUnit.YEARS)) &&
                 Pattern.compile(regexPattern).matcher(userDto.getEmail()).matches() && userDto.getName().length() > 1 && userDto.getSurname().length() > 1
                 && userDto.getPassword().length() > 4 && userDto.getUsername().length() > 1 && userDto.getSex().length() > 2) {
             try {
@@ -53,7 +53,36 @@ public class UserService {
                 return null;
             }
         }
-        else return null;
+        else {
+            String error = "error creating new guest : \n";
+            if(StringUtils.isAnyEmpty(userDto.getEmail(), userDto.getPassword(), userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getSex())) {
+                error += "something between email, pass, name, surname, username, sex is not valid \n";
+            }
+            if(userDto.getBirthDate().toLocalDate().isAfter(LocalDate.now().minus(14, ChronoUnit.YEARS))) {
+                error += "you are not old enough to access the website \n";
+            }
+            if(!Pattern.compile(regexPattern).matcher(userDto.getEmail()).matches()) {
+                error += "email not valid \n";
+            }
+            if(userDto.getName().length() < 2) {
+                error += "name length not valid \n";
+            }
+            if(userDto.getSurname().length() < 2) {
+                error += "surname length not valid \n";
+            }
+            if(userDto.getPassword().length() < 5) {
+                error += "password length not valid \n";
+            }
+            if(userDto.getUsername().length() < 2) {
+                error += "username length not valid \n";
+            }
+            if(userDto.getSex().length() < 3) {
+                error += "sex length not valid \n";
+            }
+            UserDto userError = new UserDto();
+            userError.setError(error);
+            return userError;
+        }
     }
 
     public UserDto login(LoginDto credentials) {
@@ -66,7 +95,7 @@ public class UserService {
 
 
     public UserDto updateUserDetails(UserDto userUpdate) {
-        if(StringUtils.isNoneEmpty(userUpdate.getUsername(), userUpdate.getName(), userUpdate.getSex(), userUpdate.getSurname()) && userUpdate.getBirthDate().isAfter(Instant.now().minus(14, ChronoUnit.YEARS)) && userUpdate.getId() != null) {
+        if(StringUtils.isNoneEmpty(userUpdate.getUsername(), userUpdate.getName(), userUpdate.getSex(), userUpdate.getSurname()) && userUpdate.getBirthDate().toLocalDate().isBefore(LocalDate.now().minus(14, ChronoUnit.YEARS)) && userUpdate.getId() != null) {
             try {
                 User dbUser = tokenRepository.findByToken(userUpdate.getToken()).getUser();
                 dbUser.setBirthDate(userUpdate.getBirthDate());
