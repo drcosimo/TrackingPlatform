@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
@@ -46,6 +47,9 @@ public abstract class Snapshot {
             inverseJoinColumns = @JoinColumn(name = "reaction_id")
     )
     private List<Reaction> reactions;
+
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments;
 
     public Long getId() {
         return id;
@@ -93,5 +97,13 @@ public abstract class Snapshot {
 
     public void setReactions(List<Reaction> reactions) {
         this.reactions = reactions;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

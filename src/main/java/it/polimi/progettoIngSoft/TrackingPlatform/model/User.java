@@ -78,6 +78,12 @@ public abstract class User {
     @OneToOne(mappedBy = "user")
     private Token token;
 
+    @OneToMany(mappedBy = "commentCreator")
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "responseCreator")
+    private List<ResponseComment> responses;
+
     public Long getId() {
         return id;
     }
@@ -199,5 +205,21 @@ public abstract class User {
 
     public void setReactions(List<Reaction> reactions) {
         this.reactions = reactions;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<ResponseComment> getResponses() {
+        return responses;
+    }
+
+    public void setResponses(List<ResponseComment> responses) {
+        this.responses = responses;
     }
 }
