@@ -1,7 +1,12 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.controller;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
+@RequestMapping(path = "/activity", produces="application/json" , consumes="application/json")
+@CrossOrigin(origins="*")
 public class ActivityController {
+
 }
