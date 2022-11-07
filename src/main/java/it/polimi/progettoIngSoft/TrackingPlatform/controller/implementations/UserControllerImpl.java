@@ -1,5 +1,6 @@
-package it.polimi.progettoIngSoft.TrackingPlatform.controller;
+package it.polimi.progettoIngSoft.TrackingPlatform.controller.implementations;
 
+import it.polimi.progettoIngSoft.TrackingPlatform.controller.interfaces.UserController;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ChangeEmailDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.LoginDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ResetPasswordDto;
@@ -10,21 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/user", produces="application/json" , consumes="application/json")
 @CrossOrigin(origins="*")
-public class UserController {
+public class UserControllerImpl implements UserController {
 
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestBody UserDto userDto) {
+    @Override
+    public ResponseEntity<UserDto> register (UserDto userDto) {
         //nullity parameter check
         if(userDto != null){
             UserDto returnDto = userService.register(userDto);
@@ -38,8 +35,8 @@ public class UserController {
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody LoginDto credentials){
+    @Override
+    public ResponseEntity<UserDto> login (LoginDto credentials){
         if(StringUtils.isNoneEmpty(credentials.getEmail(), credentials.getPassword())) {
             UserDto returnDto = userService.login(credentials);
             if(returnDto != null){
@@ -53,8 +50,8 @@ public class UserController {
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }
 
-    @PostMapping("/updateUserDetails")
-    public ResponseEntity<UserDto> updateUserDetails(@RequestBody UserDto userUpdate) {
+    @Override
+    public ResponseEntity<UserDto> updateUserDetails (UserDto userUpdate) {
         if(userUpdate != null){
              UserDto updateduser = userService.updateUserDetails(userUpdate);
              if(updateduser != null){
@@ -68,8 +65,8 @@ public class UserController {
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }
 
-    @PostMapping("/resetPassword")
-    public ResponseEntity<UserDto> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
+    @Override
+    public ResponseEntity<UserDto> resetPassword (ResetPasswordDto resetPasswordDto) {
         if(resetPasswordDto != null){
             UserDto userDto = userService.resetPassword(resetPasswordDto);
             if(userDto != null){
@@ -83,8 +80,8 @@ public class UserController {
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }
 
-    @PostMapping("/changeEmail")
-    public ResponseEntity<UserDto> changeEmail(@RequestBody ChangeEmailDto changeEmailDto) {
+    @Override
+    public ResponseEntity<UserDto> changeEmail (ChangeEmailDto changeEmailDto) {
         if(changeEmailDto != null){
             UserDto userDto = userService.changeEmail(changeEmailDto);
             if(userDto != null){
