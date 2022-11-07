@@ -20,6 +20,8 @@ public class UserControllerImpl implements UserController {
     @Autowired
     private UserService userService;
 
+    //add token control from every method
+
     @Override
     public ResponseEntity<UserDto> register (UserDto userDto) {
         //nullity parameter check

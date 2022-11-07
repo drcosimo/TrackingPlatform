@@ -36,6 +36,13 @@ public class Activity {
     @OneToMany(mappedBy = "activity")
     private List<ActivityPost> activityPosts = null;
 
+    public Activity(String name, String description, Instant beginDate, Instant endDate) {
+        this.name = name;
+        this.description = description;
+        this.beginDate = beginDate;
+        this.endDate = endDate;
+    }
+
     public Activity() {
     }
 

@@ -1,6 +1,8 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.Activity;
+
 import java.time.Instant;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,11 +17,24 @@ public class ActivityDto {
 
     private Instant endDate;
 
-    private String activityName;
+    private String projectName;
 
-    private Integer numberOfActivities;
+    private Integer numberOfPosts;
 
     public ActivityDto() {
+    }
+
+    public ActivityDto(Activity activity) {
+        id = activity.getId();
+        name = activity.getName();
+        description = activity.getDescription();
+        beginDate = activity.getBeginDate();
+        endDate = activity.getEndDate();
+        projectName = activity.getActivityProject().getName();
+        if(activity.getActivityPosts() != null){
+            numberOfPosts = activity.getActivityPosts().size();
+        }
+        else numberOfPosts = 0;
     }
 
     public Long getId() {
@@ -62,19 +77,19 @@ public class ActivityDto {
         this.endDate = endDate;
     }
 
-    public String getActivityName() {
-        return activityName;
+    public String getProjectName() {
+        return projectName;
     }
 
-    public void setActivityName(String activityName) {
-        this.activityName = activityName;
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
-    public Integer getNumberOfActivities() {
-        return numberOfActivities;
+    public Integer getNumberOfPosts() {
+        return numberOfPosts;
     }
 
-    public void setNumberOfActivities(Integer numberOfActivities) {
-        this.numberOfActivities = numberOfActivities;
+    public void setNumberOfPosts(Integer numberOfPosts) {
+        this.numberOfPosts = numberOfPosts;
     }
 }

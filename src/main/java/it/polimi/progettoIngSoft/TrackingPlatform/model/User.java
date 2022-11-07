@@ -40,6 +40,9 @@ public abstract class User {
     @Column(nullable = false)
     private String sex;
 
+    @Column(nullable = false)
+    private Boolean isActive = true;
+
     @ManyToMany
     @JoinTable(
             name = "creators_projects",
@@ -221,5 +224,13 @@ public abstract class User {
 
     public void setResponses(List<ResponseComment> responses) {
         this.responses = responses;
+    }
+
+    public Boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 }
