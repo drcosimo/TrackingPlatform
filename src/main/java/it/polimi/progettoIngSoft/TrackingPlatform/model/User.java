@@ -87,6 +87,21 @@ public abstract class User {
     @OneToMany(mappedBy = "responseCreator")
     private List<ResponseComment> responses;
 
+    @Override
+    public boolean equals (Object obj){
+        try {
+            User toCompare = (User) obj;
+            if((this == toCompare) || (this.token == toCompare.getToken()) ||
+            (this.email.equals(toCompare.getEmail())) && this.password.equals(toCompare.getPassword())) {
+                return true;
+            }
+            else return false;
+        }
+        catch (Exception e){
+            return false;
+        }
+    }
+
     public Long getId() {
         return id;
     }
