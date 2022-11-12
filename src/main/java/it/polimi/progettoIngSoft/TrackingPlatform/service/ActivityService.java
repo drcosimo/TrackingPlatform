@@ -2,9 +2,12 @@ package it.polimi.progettoIngSoft.TrackingPlatform.service;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.Activity;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ActivityDto;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ProjectActivitiesRequest;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.RequestActivityDto;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.Project;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.ActivityRepository;
+import it.polimi.progettoIngSoft.TrackingPlatform.repository.ProjectRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.TokenRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Iterator;
+import java.util.List;
 
 
 @Service
@@ -23,6 +27,9 @@ public class ActivityService {
 
     @Autowired
     private ActivityRepository activityRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     public ActivityDto createActivity(RequestActivityDto requestActivityDto) {
         try {
@@ -70,6 +77,23 @@ public class ActivityService {
                 }
                 activityRepository.save(activity);
                 return new ActivityDto(activity);
+            }
+            else {
+                return null;
+            }
+        }
+        catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<ActivityDto> getActivitiesFromProject(ProjectActivitiesRequest projectActivitiesRequest) {
+        try {
+            User user = tokenRepository.getUserByToken(projectActivitiesRequest.getToken());
+            if(user != null && projectActivitiesRequest.getProjectId() != null) {
+                Project project = projectRepository.findById(projectActivitiesRequest.getProjectId()).get();
+                //List<Activity> projectActivities = activityRepository;
+                return null;
             }
             else {
                 return null;
