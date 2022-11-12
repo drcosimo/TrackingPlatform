@@ -4,7 +4,6 @@ import it.polimi.progettoIngSoft.TrackingPlatform.controller.interfaces.Activity
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ActivityDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ProjectActivitiesRequest;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.RequestActivityDto;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.service.ActivityService;
 import it.polimi.progettoIngSoft.TrackingPlatform.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
