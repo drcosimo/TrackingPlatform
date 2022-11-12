@@ -27,14 +27,14 @@ public class ActivityService {
     public ActivityDto createActivity(RequestActivityDto requestActivityDto) {
         try {
             User user = tokenRepository.getUserByToken(requestActivityDto.getToken());
-            if(user != null && StringUtils.isNotEmpty(requestActivityDto.getName())) {
+            if(user != null && StringUtils.isNotEmpty(requestActivityDto.getName()) &&
+                    (requestActivityDto.getBeginDate() == null || requestActivityDto.getEndDate() == null || requestActivityDto.getBeginDate().isBefore(requestActivityDto.getEndDate()))) {
                 Activity activity = activityRepository.save(new Activity(requestActivityDto.getName(), requestActivityDto.getDescription(), requestActivityDto.getBeginDate(), requestActivityDto.getEndDate()));
-                if(activity != null) {
-                    return new ActivityDto(activity);
-                }
-                else return null;
+                return new ActivityDto(activity);
             }
-            else return null;
+            else  {
+                return null;
+            }
         }
         catch (Exception e) {
             return null;
@@ -57,10 +57,21 @@ public class ActivityService {
             if(!found) {
                 return null;
             }
-            //if the user has access to the activities
+            //if the user has access to the activity
+            else if (StringUtils.isNotEmpty(updatedActivity.getName())) {
+                activity.setName(updatedActivity.getName());
+                if(!updatedActivity.getDescription().isEmpty()) {
+                    activity.setDescription(updatedActivity.getDescription());
+                }
+                //check coherence of begin/end dates
+                if(updatedActivity.getBeginDate() == null || updatedActivity.getEndDate() == null || updatedActivity.getBeginDate().isBefore(updatedActivity.getEndDate())) {
+                    activity.setBeginDate(updatedActivity.getBeginDate());
+                    activity.setEndDate(updatedActivity.getEndDate());
+                }
+                activityRepository.save(activity);
+                return new ActivityDto(activity);
+            }
             else {
-                //check that the activity has all valid fields
-                //update it!
                 return null;
             }
         }
