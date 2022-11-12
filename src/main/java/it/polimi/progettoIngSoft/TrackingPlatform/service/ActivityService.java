@@ -31,6 +31,7 @@ public class ActivityService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    //add conflicts check of activities' time period
     public ActivityDto createActivity(RequestActivityDto requestActivityDto) {
         try {
             User user = tokenRepository.getUserByToken(requestActivityDto.getToken());
@@ -48,11 +49,12 @@ public class ActivityService {
         }
     }
 
+    //add conflicts check of activities' time period
     public ActivityDto updateActivity(RequestActivityDto updatedActivity) {
         try {
             User user = tokenRepository.getUserByToken(updatedActivity.getToken());
             Activity activity = activityRepository.findById(updatedActivity.getId()).get();
-            //check if the user is an admin or a creator of the activity
+            //check if the user is an admin or a creator of the activity's project
             boolean found = false;
             Iterator creatorsCounter = activity.getActivityProject().getCreators().iterator();
             Iterator adminsCounter = activity.getActivityProject().getAdmins().iterator();
@@ -64,7 +66,7 @@ public class ActivityService {
             if(!found) {
                 return null;
             }
-            //if the user has access to the activity
+            //if the user has access to the project
             else if (StringUtils.isNotEmpty(updatedActivity.getName())) {
                 activity.setName(updatedActivity.getName());
                 if(!updatedActivity.getDescription().isEmpty()) {
@@ -91,9 +93,18 @@ public class ActivityService {
         try {
             User user = tokenRepository.getUserByToken(projectActivitiesRequest.getToken());
             if(user != null && projectActivitiesRequest.getProjectId() != null) {
-                Project project = projectRepository.findById(projectActivitiesRequest.getProjectId()).get();
-                //List<Activity> projectActivities = activityRepository;
-                return null;
+                List<Activity> projectActivities = activityRepository.getProjectActivitiesById(projectActivitiesRequest.getProjectId());
+                if (!projectActivities.isEmpty()) {
+                    Iterator<Activity> activityCounter = projectActivities.iterator();
+                    List<ActivityDto> returnList = List.of();
+                    while (activityCounter.hasNext()) {
+                        returnList.add(new ActivityDto(activityCounter.next()));
+                    }
+                    return returnList;
+                }
+                else {
+                    return null;
+                }
             }
             else {
                 return null;
