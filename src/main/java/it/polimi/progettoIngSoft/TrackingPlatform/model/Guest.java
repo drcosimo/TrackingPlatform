@@ -22,5 +22,6 @@ public class Guest extends User {
         setPassword(password);
         setBirthDate(birthDate);
         setSex(sex);
+        setActive(true);
     }
 }

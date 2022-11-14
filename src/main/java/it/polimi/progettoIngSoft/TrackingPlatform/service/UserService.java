@@ -33,9 +33,12 @@ public class UserService {
     @Autowired
     private TokenGenerator tokenGenerator;
 
+    @Autowired
+    private  TokenService tokenService;
+
     public UserDto register(UserDto userDto) {
         //check guest register fields not null or invalid
-        if(StringUtils.isNoneEmpty(userDto.getEmail(), userDto.getPassword(), userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getSex())
+        if (StringUtils.isNoneEmpty(userDto.getEmail(), userDto.getPassword(), userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getSex())
                 && userDto.getBirthDate().toLocalDate().isBefore(LocalDate.now().minus(14, ChronoUnit.YEARS)) &&
                 Pattern.compile(regexPattern).matcher(userDto.getEmail()).matches() && userDto.getName().length() > 1 && userDto.getSurname().length() > 1
                 && userDto.getPassword().length() > 4 && userDto.getUsername().length() > 1 && userDto.getSex().length() > 2) {
@@ -55,28 +58,28 @@ public class UserService {
         }
         else {
             String error = "error creating new guest : \n";
-            if(StringUtils.isAnyEmpty(userDto.getEmail(), userDto.getPassword(), userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getSex())) {
+            if (StringUtils.isAnyEmpty(userDto.getEmail(), userDto.getPassword(), userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getSex())) {
                 error += "something between email, pass, name, surname, username, sex is not valid \n";
             }
-            if(userDto.getBirthDate().toLocalDate().isAfter(LocalDate.now().minus(14, ChronoUnit.YEARS))) {
+            if (userDto.getBirthDate().toLocalDate().isAfter(LocalDate.now().minus(14, ChronoUnit.YEARS))) {
                 error += "you are not old enough to access the website \n";
             }
-            if(!Pattern.compile(regexPattern).matcher(userDto.getEmail()).matches()) {
+            if (!Pattern.compile(regexPattern).matcher(userDto.getEmail()).matches()) {
                 error += "email not valid \n";
             }
-            if(userDto.getName().length() < 2) {
+            if (userDto.getName().length() < 2) {
                 error += "name length not valid \n";
             }
-            if(userDto.getSurname().length() < 2) {
+            if (userDto.getSurname().length() < 2) {
                 error += "surname length not valid \n";
             }
-            if(userDto.getPassword().length() < 5) {
+            if (userDto.getPassword().length() < 5) {
                 error += "password length not valid \n";
             }
-            if(userDto.getUsername().length() < 2) {
+            if (userDto.getUsername().length() < 2) {
                 error += "username length not valid \n";
             }
-            if(userDto.getSex().length() < 3) {
+            if (userDto.getSex().length() < 3) {
                 error += "sex length not valid \n";
             }
             UserDto userError = new UserDto();
@@ -87,16 +90,18 @@ public class UserService {
 
     public UserDto login(LoginDto credentials) {
         User user = userRepository.getByEmailAndPassword(credentials.getEmail(), credentials.getPassword());
-        if(user == null) return null;
-        else{
+        if (user == null || !tokenService.isUserEnabled(user.getToken().getToken())) {
+            return null;
+        }
+        else {
             return new UserDto(user.getId(), user.getName(), user.getSurname(), user.getUsername(), user.getEmail(), user.getBirthDate(), user.getSex(), tokenGenerator.getUserToken(user).getToken(), user.isAdmin());
         }
     }
 
 
     public UserDto updateUserDetails(UserDto userUpdate) {
-        if(StringUtils.isNoneEmpty(userUpdate.getUsername(), userUpdate.getName(), userUpdate.getSex(), userUpdate.getSurname()) && userUpdate.getBirthDate().toLocalDate().isBefore(LocalDate.now().minus(14, ChronoUnit.YEARS)) && userUpdate.getId() != null) {
-            try {
+        try {
+            if (tokenService.isUserEnabled(userUpdate.getToken()) && StringUtils.isNoneEmpty(userUpdate.getUsername(), userUpdate.getName(), userUpdate.getSex(), userUpdate.getSurname()) && userUpdate.getBirthDate().toLocalDate().isBefore(LocalDate.now().minus(14, ChronoUnit.YEARS)) && userUpdate.getId() != null) {
                 User dbUser = tokenRepository.findByToken(userUpdate.getToken()).getUser();
                 dbUser.setBirthDate(userUpdate.getBirthDate());
                 dbUser.setUsername(userUpdate.getUsername());
@@ -106,17 +111,17 @@ public class UserService {
                 dbUser = userRepository.save(dbUser);
                 return new UserDto(dbUser);
             }
-            catch (Exception e) {
-                System.out.println(e);
-                return null;
-            }
+            else return null;
         }
-        else return null;
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
     }
 
     public UserDto resetPassword(ResetPasswordDto resetPasswordDto) {
-        if(StringUtils.isNoneEmpty(resetPasswordDto.getNewPassword(), resetPasswordDto.getOldPassword(), resetPasswordDto.getToken())) {
-            try {
+        try {
+            if (tokenService.isUserEnabled(resetPasswordDto.getToken()) && StringUtils.isNoneEmpty(resetPasswordDto.getNewPassword(), resetPasswordDto.getOldPassword(), resetPasswordDto.getToken())) {
                 User user = tokenRepository.findByToken(resetPasswordDto.getToken()).getUser();
                 //check if the old password is valid
                 if(user != null && resetPasswordDto.getOldPassword().equals(user.getPassword()) && resetPasswordDto.getNewPassword().length() > 4) {
@@ -124,20 +129,24 @@ public class UserService {
                     userRepository.save(user);
                     return new UserDto(user);
                 }
-                else return null;
+                else {
+                    return null;
+                }
             }
-            catch (Exception e) {
-                System.out.println(e);
+            else {
                 return null;
             }
         }
-        else return null;
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
     }
 
 
     public UserDto changeEmail(ChangeEmailDto changeEmailDto) {
-        if(StringUtils.isNoneEmpty(changeEmailDto.getNewEmail(), changeEmailDto.getOldEmail(), changeEmailDto.getToken())) {
-            try {
+        try {
+            if (tokenService.isUserEnabled(changeEmailDto.getToken()) && StringUtils.isNoneEmpty(changeEmailDto.getNewEmail(), changeEmailDto.getOldEmail(), changeEmailDto.getToken())) {
                 User user = tokenRepository.findByToken(changeEmailDto.getToken()).getUser();
                 //check that the new email is not used in another account
                 User uniqueEmailTest = userRepository.findByEmail(changeEmailDto.getNewEmail());
@@ -146,13 +155,36 @@ public class UserService {
                     userRepository.save(user);
                     return new UserDto(user);
                 }
-                else return null;
+                else {
+                    return null;
+                }
             }
-            catch (Exception e) {
-                System.out.println(e);
+            else {
                 return null;
             }
         }
-        else return null;
+        catch (Exception e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
+
+    public Boolean unsubscribe(String userToken) {
+        try {
+            if(tokenService.isUserEnabled(userToken)) {
+                User user = tokenRepository.getUserByToken(userToken);
+                user.setActive(false);
+                userRepository.save(user);
+                return Boolean.TRUE;
+            }
+            else {
+                return  Boolean.FALSE;
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return Boolean.FALSE;
+        }
     }
 }

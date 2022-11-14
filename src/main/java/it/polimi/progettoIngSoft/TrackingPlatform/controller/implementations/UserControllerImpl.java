@@ -32,7 +32,7 @@ public class UserControllerImpl implements UserController {
                         returnDto,
                         HttpStatus.OK);
             }
-            else return ResponseEntity.badRequest().build();
+            else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }
@@ -47,7 +47,7 @@ public class UserControllerImpl implements UserController {
                         HttpStatus.OK
                 );
             }
-            else return ResponseEntity.badRequest().build();
+            else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }
@@ -62,7 +62,7 @@ public class UserControllerImpl implements UserController {
                          HttpStatus.OK
                  );
              }
-             else return ResponseEntity.badRequest().build();
+             else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }
@@ -77,7 +77,7 @@ public class UserControllerImpl implements UserController {
                         HttpStatus.OK
                 );
             }
-            else return ResponseEntity.badRequest().build();
+            else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
     }
@@ -92,8 +92,33 @@ public class UserControllerImpl implements UserController {
                         HttpStatus.OK
                 );
             }
-            else return ResponseEntity.badRequest().build();
+            else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> unsubscribe(String userToken) {
+        if(StringUtils.isNotEmpty(userToken)) {
+            Boolean hasBeenCanceled = userService.unsubscribe(userToken);
+            if(hasBeenCanceled) {
+                return new ResponseEntity<>(
+                        Boolean.TRUE,
+                        HttpStatus.OK
+                );
+            }
+            else {
+                return new ResponseEntity<>(
+                        Boolean.FALSE,
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+        }
+        else {
+            return new ResponseEntity<>(
+                    Boolean.FALSE,
+                    HttpStatus.BAD_REQUEST
+            );
+        }
     }
 }

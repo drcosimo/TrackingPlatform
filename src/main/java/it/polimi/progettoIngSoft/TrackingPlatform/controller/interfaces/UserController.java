@@ -27,4 +27,7 @@ public interface UserController {
 
     @PostMapping("/changeEmail")
     public ResponseEntity<UserDto> changeEmail (@RequestBody ChangeEmailDto changeEmailDto);
+
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<Boolean> unsubscribe (@RequestBody String userToken);
 }
