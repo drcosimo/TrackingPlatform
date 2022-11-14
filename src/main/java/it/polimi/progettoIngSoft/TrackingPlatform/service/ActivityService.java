@@ -6,7 +6,6 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ProjectActivitiesReq
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.RequestActivityDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.ActivityRepository;
-import it.polimi.progettoIngSoft.TrackingPlatform.repository.ProjectRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.TokenRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.util.ActivityUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +44,7 @@ public class ActivityService {
             return null;
         }
         catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -87,6 +87,7 @@ public class ActivityService {
             return null;
         }
         catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -113,6 +114,7 @@ public class ActivityService {
             }
             return null;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

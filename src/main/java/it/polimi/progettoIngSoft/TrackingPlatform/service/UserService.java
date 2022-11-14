@@ -52,7 +52,7 @@ public class UserService {
                 return login(loginDto);
             }
             catch (Exception e){
-                System.out.println(e);
+                e.printStackTrace();
                 return null;
             }
         }
@@ -114,7 +114,7 @@ public class UserService {
             else return null;
         }
         catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
     }
@@ -138,7 +138,7 @@ public class UserService {
             }
         }
         catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
     }
@@ -164,7 +164,7 @@ public class UserService {
             }
         }
         catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return null;
         }
     }
