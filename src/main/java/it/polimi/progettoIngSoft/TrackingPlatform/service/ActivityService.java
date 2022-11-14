@@ -29,20 +29,20 @@ public class ActivityService {
     private ActivityRepository activityRepository;
 
     @Autowired
-    private ProjectRepository projectRepository;
+    private TokenService tokenService;
 
     //add conflicts check of activities' time period
     public ActivityDto createActivity(RequestActivityDto requestActivityDto) {
         try {
-            User user = tokenRepository.getUserByToken(requestActivityDto.getToken());
-            Activity activity = activityRepository.save(new Activity(requestActivityDto.getName(), requestActivityDto.getDescription(), requestActivityDto.getBeginDate(), requestActivityDto.getEndDate()));
-            List<Activity> existingActivities = activityRepository.getProjectActivitiesById(activity.getActivityProject().getId());
-            if(user != null && StringUtils.isNotEmpty(requestActivityDto.getName()) && ActivityUtil.isNotInConflict(requestActivityDto, existingActivities)) {
-                return new ActivityDto(activity);
+            if(tokenService.isUserEnabled(requestActivityDto.getToken())) {
+                User user = tokenRepository.getUserByToken(requestActivityDto.getToken());
+                Activity activity = activityRepository.save(new Activity(requestActivityDto.getName(), requestActivityDto.getDescription(), requestActivityDto.getBeginDate(), requestActivityDto.getEndDate()));
+                List<Activity> existingActivities = activityRepository.getProjectActivitiesById(activity.getActivityProject().getId());
+                if(user != null && StringUtils.isNotEmpty(requestActivityDto.getName()) && ActivityUtil.isNotInConflict(requestActivityDto, existingActivities)) {
+                    return new ActivityDto(activity);
+                }
             }
-            else  {
-                return null;
-            }
+            return null;
         }
         catch (Exception e) {
             return null;
@@ -52,37 +52,39 @@ public class ActivityService {
     //add conflicts check of activities' time period
     public ActivityDto updateActivity(RequestActivityDto updatedActivityDto) {
         try {
-            User user = tokenRepository.getUserByToken(updatedActivityDto.getToken());
-            Activity activity = activityRepository.findById(updatedActivityDto.getId()).get();
-            //check if the user is an admin or a creator of the activity's project
-            boolean found = false;
-            Iterator creatorsCounter = activity.getActivityProject().getCreators().iterator();
-            Iterator adminsCounter = activity.getActivityProject().getAdmins().iterator();
-            while(creatorsCounter.hasNext() && adminsCounter.hasNext() && !found) {
-                if (user.equals(creatorsCounter.next()) || user.equals(adminsCounter.next())) {
-                    found = true;
-                }
-            }
-            if(!found) {
-                return null;
-            }
-            //if the user has access to the project and the modified activity is not in conflict with any other activity
-            else {
-                List<Activity> existingActivities = activityRepository.getProjectActivitiesById(activity.getActivityProject().getId());
-                if (StringUtils.isNotEmpty(updatedActivityDto.getName()) && ActivityUtil.isNotInConflict(updatedActivityDto, existingActivities)) {
-                    activity.setName(updatedActivityDto.getName());
-                    if(!updatedActivityDto.getDescription().isEmpty()) {
-                        activity.setDescription(updatedActivityDto.getDescription());
+            if(tokenService.isUserEnabled(updatedActivityDto.getToken())) {
+                User user = tokenRepository.getUserByToken(updatedActivityDto.getToken());
+                Activity activity = activityRepository.findById(updatedActivityDto.getId()).get();
+                //check if the user is an admin or a creator of the activity's project
+                boolean found = false;
+                Iterator creatorsCounter = activity.getActivityProject().getCreators().iterator();
+                Iterator adminsCounter = activity.getActivityProject().getAdmins().iterator();
+                while (creatorsCounter.hasNext() && adminsCounter.hasNext() && !found) {
+                    if (user.equals(creatorsCounter.next()) || user.equals(adminsCounter.next())) {
+                        found = true;
                     }
-                    activity.setBeginDate(updatedActivityDto.getBeginDate());
-                    activity.setEndDate(updatedActivityDto.getEndDate());
-                    activityRepository.save(activity);
-                    return new ActivityDto(activity);
                 }
-                else {
+                if (!found) {
                     return null;
                 }
+                //if the user has access to the project and the modified activity is not in conflict with any other activity
+                else {
+                    List<Activity> existingActivities = activityRepository.getProjectActivitiesById(activity.getActivityProject().getId());
+                    if (StringUtils.isNotEmpty(updatedActivityDto.getName()) && ActivityUtil.isNotInConflict(updatedActivityDto, existingActivities)) {
+                        activity.setName(updatedActivityDto.getName());
+                        if (!updatedActivityDto.getDescription().isEmpty()) {
+                            activity.setDescription(updatedActivityDto.getDescription());
+                        }
+                        activity.setBeginDate(updatedActivityDto.getBeginDate());
+                        activity.setEndDate(updatedActivityDto.getEndDate());
+                        activityRepository.save(activity);
+                        return new ActivityDto(activity);
+                    } else {
+                        return null;
+                    }
+                }
             }
+            return null;
         }
         catch (Exception e) {
             return null;
@@ -91,22 +93,25 @@ public class ActivityService {
 
     public List<ActivityDto> getActivitiesFromProject(ProjectActivitiesRequest projectActivitiesRequest) {
         try {
-            User user = tokenRepository.getUserByToken(projectActivitiesRequest.getToken());
-            if (user != null && projectActivitiesRequest.getProjectId() != null) {
-                List<Activity> projectActivities = activityRepository.getProjectActivitiesById(projectActivitiesRequest.getProjectId());
-                if (!projectActivities.isEmpty()) {
-                    Iterator<Activity> activityCounter = projectActivities.listIterator();
-                    List<ActivityDto> returnList = List.of();
-                    while (activityCounter.hasNext()) {
-                        returnList.add(new ActivityDto(activityCounter.next()));
+            if(tokenService.isUserEnabled(projectActivitiesRequest.getToken())) {
+                User user = tokenRepository.getUserByToken(projectActivitiesRequest.getToken());
+                if (user != null && projectActivitiesRequest.getProjectId() != null) {
+                    List<Activity> projectActivities = activityRepository.getProjectActivitiesById(projectActivitiesRequest.getProjectId());
+                    if (!projectActivities.isEmpty()) {
+                        Iterator<Activity> activityCounter = projectActivities.listIterator();
+                        List<ActivityDto> returnList = List.of();
+                        while (activityCounter.hasNext()) {
+                            returnList.add(new ActivityDto(activityCounter.next()));
+                        }
+                        return returnList;
+                    } else {
+                        return null;
                     }
-                    return returnList;
                 } else {
                     return null;
                 }
-            } else {
-                return null;
             }
+            return null;
         } catch (Exception e) {
             return null;
         }
