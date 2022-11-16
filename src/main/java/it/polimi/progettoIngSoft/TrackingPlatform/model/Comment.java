@@ -28,61 +28,10 @@ public class Comment {
     @JoinColumn(name = "commentCreator")
     private User commentCreator;
 
-    @ManyToOne
-    @JoinColumn(name = "post")
-    private Snapshot post;
-
     @OneToMany(mappedBy = "mainComment")
     private List<ResponseComment> responses;
 
     public Comment() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public Instant getCreationTime() {
-        return creationTime;
-    }
-
-    public void setCreationTime(Instant creationTime) {
-        this.creationTime = creationTime;
-    }
-
-    public User getCommentCreator() {
-        return commentCreator;
-    }
-
-    public void setCommentCreator(User commentCreator) {
-        this.commentCreator = commentCreator;
-    }
-
-    public Snapshot getPost() {
-        return post;
-    }
-
-    public void setPost(Snapshot post) {
-        this.post = post;
-    }
-
-    public List<ResponseComment> getResponses() {
-        return responses;
-    }
-
-    public void setResponses(List<ResponseComment> responses) {
-        this.responses = responses;
-    }
 }

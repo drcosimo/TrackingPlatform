@@ -5,13 +5,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ProjectImage extends Image{
+public class ActivityProject extends Activity{
 
     @ManyToOne
     @JoinColumn(name = "project")
     private Project project;
 
-    public ProjectImage() {
+    public ActivityProject() {
     }
 
     public Project getProject() {

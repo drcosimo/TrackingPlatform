@@ -5,13 +5,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ActivityPost extends Snapshot{
+public class ActivityImage extends Image {
 
     @ManyToOne
     @JoinColumn(name = "activity")
     private Activity activity;
 
-    public ActivityPost() {
+    public ActivityImage() {
     }
 
     public Activity getActivity() {
