@@ -1,5 +1,9 @@
-package it.polimi.progettoIngSoft.TrackingPlatform.model;
+package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.reaction;
 
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,18 +17,19 @@ import java.util.List;
 public abstract class Reaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_reaction")
     private Long id;
 
     @ManyToMany
     @JoinTable(
             name = "reactions_users",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "reaction_id")
+            joinColumns = @JoinColumn(name = "reaction_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> users;
 
     @ManyToMany(mappedBy = "reactions")
-    private List<Snapshot> snapshots;
+    private List<Post> posts;
 
     public Long getId() {
         return id;
@@ -42,11 +47,11 @@ public abstract class Reaction {
         this.users = users;
     }
 
-    public List<Snapshot> getSnapshots() {
-        return snapshots;
+    public List<Post> getPosts() {
+        return posts;
     }
 
-    public void setSnapshots(List<Snapshot> snapshots) {
-        this.snapshots = snapshots;
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 }

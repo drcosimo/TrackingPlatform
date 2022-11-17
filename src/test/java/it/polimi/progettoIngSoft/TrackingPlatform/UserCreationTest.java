@@ -1,15 +1,8 @@
 package it.polimi.progettoIngSoft.TrackingPlatform;
 
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Admin;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Guest;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.Instant;
 
 @SpringBootTest
 public class UserCreationTest {

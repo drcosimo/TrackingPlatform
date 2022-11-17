@@ -1,10 +1,11 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.service;
 
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Activity;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Activity;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ActivityDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ProjectActivitiesRequest;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.RequestActivityDto;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.ActivityProject;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.ActivityRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.TokenRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.util.ActivityUtil;
@@ -35,8 +36,8 @@ public class ActivityService {
         try {
             if(tokenService.isUserEnabled(requestActivityDto.getToken())) {
                 User user = tokenRepository.getUserByToken(requestActivityDto.getToken());
-                Activity activity = activityRepository.save(new Activity(requestActivityDto.getName(), requestActivityDto.getDescription(), requestActivityDto.getBeginDate(), requestActivityDto.getEndDate()));
-                List<Activity> existingActivities = activityRepository.getProjectActivitiesById(activity.getActivityProject().getId());
+                Activity activity = activityRepository.save(new ActivityProject(requestActivityDto.getName(), requestActivityDto.getDescription(), requestActivityDto.getBeginDate(), requestActivityDto.getEndDate()));
+                List<Activity> existingActivities = activityRepository.getProjectActivitiesById(activity.getId());
                 if(user != null && StringUtils.isNotEmpty(requestActivityDto.getName()) && ActivityUtil.isNotInConflict(requestActivityDto, existingActivities)) {
                     return new ActivityDto(activity);
                 }
@@ -57,8 +58,8 @@ public class ActivityService {
                 Activity activity = activityRepository.findById(updatedActivityDto.getId()).get();
                 //check if the user is an admin or a creator of the activity's project
                 boolean found = false;
-                Iterator creatorsCounter = activity.getActivityProject().getCreators().iterator();
-                Iterator adminsCounter = activity.getActivityProject().getAdmins().iterator();
+                Iterator creatorsCounter = activity.getCreators().iterator();
+                Iterator adminsCounter = activity.getAdmins().iterator();
                 while (creatorsCounter.hasNext() && adminsCounter.hasNext() && !found) {
                     if (user.equals(creatorsCounter.next()) || user.equals(adminsCounter.next())) {
                         found = true;
@@ -69,7 +70,7 @@ public class ActivityService {
                 }
                 //if the user has access to the project and the modified activity is not in conflict with any other activity
                 else {
-                    List<Activity> existingActivities = activityRepository.getProjectActivitiesById(activity.getActivityProject().getId());
+                    List<Activity> existingActivities = activityRepository.getProjectActivitiesById(activity.getId());
                     if (StringUtils.isNotEmpty(updatedActivityDto.getName()) && ActivityUtil.isNotInConflict(updatedActivityDto, existingActivities)) {
                         activity.setName(updatedActivityDto.getName());
                         if (!updatedActivityDto.getDescription().isEmpty()) {

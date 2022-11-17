@@ -1,4 +1,6 @@
-package it.polimi.progettoIngSoft.TrackingPlatform.model;
+package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment;
+
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -7,12 +9,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
-public class ResponseComment {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_comment")
     private Long id;
 
     @Column(nullable = false)
@@ -23,14 +28,17 @@ public class ResponseComment {
     private Instant creationTime;
 
     @ManyToOne
-    @JoinColumn(name = "responseCreator")
-    private User responseCreator;
+    @JoinColumn(name = "id_user")
+    private User commentCreator;
 
-    @ManyToOne
-    @JoinColumn(name = "mainComment")
-    private Comment mainComment;
+    @Column(nullable = false)
+    private boolean visible = true;
 
-    public ResponseComment() {
+    @OneToMany
+    @JoinColumn(name = "id_comment_reply")
+    private List<CommentReply> replies = null;
+
+    public Comment() {
     }
 
     public Long getId() {
@@ -57,19 +65,27 @@ public class ResponseComment {
         this.creationTime = creationTime;
     }
 
-    public User getResponseCreator() {
-        return responseCreator;
+    public User getCommentCreator() {
+        return commentCreator;
     }
 
-    public void setResponseCreator(User responseCreator) {
-        this.responseCreator = responseCreator;
+    public void setCommentCreator(User commentCreator) {
+        this.commentCreator = commentCreator;
     }
 
-    public Comment getMainComment() {
-        return mainComment;
+    public boolean isVisible() {
+        return visible;
     }
 
-    public void setMainComment(Comment mainComment) {
-        this.mainComment = mainComment;
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+
+    public List<CommentReply> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(List<CommentReply> replies) {
+        this.replies = replies;
     }
 }

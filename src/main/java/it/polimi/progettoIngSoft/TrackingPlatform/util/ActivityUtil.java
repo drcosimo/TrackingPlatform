@@ -1,6 +1,6 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.util;
 
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Activity;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Activity;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.RequestActivityDto;
 

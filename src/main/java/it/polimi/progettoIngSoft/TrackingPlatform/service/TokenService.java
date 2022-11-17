@@ -1,6 +1,6 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.service;
 
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Token;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Token;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ public class TokenService {
     public boolean isUserEnabled(String token) {
         try {
             Token tokenObj = tokenRepository.findByToken(token);
-            return tokenObj.getUser().isActive();
+            return tokenObj.getUser().getActive();
         }
         catch (Exception e) {
             return false;

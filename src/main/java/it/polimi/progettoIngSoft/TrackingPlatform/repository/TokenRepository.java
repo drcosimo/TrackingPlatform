@@ -1,7 +1,7 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.repository;
 
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Token;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Token;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

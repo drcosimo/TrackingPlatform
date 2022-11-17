@@ -1,4 +1,6 @@
-package it.polimi.progettoIngSoft.TrackingPlatform.model;
+package it.polimi.progettoIngSoft.TrackingPlatform.model.entities;
+
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +16,7 @@ public class Token {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_token")
     private Long id;
 
     @Column(nullable = false)

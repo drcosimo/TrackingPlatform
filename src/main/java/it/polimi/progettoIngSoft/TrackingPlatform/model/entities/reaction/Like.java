@@ -1,4 +1,4 @@
-package it.polimi.progettoIngSoft.TrackingPlatform.model;
+package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.reaction;
 
 import javax.persistence.Entity;
 

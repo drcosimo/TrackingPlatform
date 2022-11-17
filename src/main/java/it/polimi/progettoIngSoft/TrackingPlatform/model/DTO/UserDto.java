@@ -1,8 +1,8 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Admin;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.User;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.Admin;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 
 import java.sql.Date;
 

@@ -1,7 +1,7 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.Activity;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Activity;
 
 import java.time.Instant;
 
@@ -30,9 +30,9 @@ public class ActivityDto {
         description = activity.getDescription();
         beginDate = activity.getBeginDate();
         endDate = activity.getEndDate();
-        projectName = activity.getActivityProject().getName();
-        if(activity.getActivityPosts() != null){
-            numberOfPosts = activity.getActivityPosts().size();
+        projectName = activity.getName();
+        if(activity.getPostImages() != null){
+            numberOfPosts = activity.getPostImages().size();
         }
         else numberOfPosts = 0;
     }
