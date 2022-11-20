@@ -34,14 +34,15 @@ public class UserDto {
     }
 
     public UserDto (User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setName(user.getName());
-        userDto.setSurname(user.getSurname());
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        userDto.setBirthDate(user.getBirthDate());
-        userDto.setAdmin(user instanceof Admin);
+        setId(user.getId());
+        setName(user.getName());
+        setSurname(user.getSurname());
+        setUsername(user.getUsername());
+        setEmail(user.getEmail());
+        setBirthDate(user.getBirthDate());
+        setAdmin(user instanceof Admin);
+        setSex(user.getSex());
+        setToken(user.getToken().getToken());
     }
 
     public UserDto(Long id, String name, String surname, String username, String email, Date birthDate, String sex, String token, boolean isAdmin) {

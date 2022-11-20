@@ -103,7 +103,7 @@ public class UserService {
 
     public UserDto updateUserDetails(UserDto userUpdate) {
         try {
-            if (tokenService.isUserEnabled(userUpdate.getToken()) && StringUtils.isNoneEmpty(userUpdate.getUsername(), userUpdate.getName(), userUpdate.getSex(), userUpdate.getSurname()) && userUpdate.getBirthDate().toLocalDate().isBefore(LocalDate.now().minus(14, ChronoUnit.YEARS)) && userUpdate.getId() != null) {
+            if (tokenService.isUserEnabled(userUpdate.getToken()) && StringUtils.isNoneEmpty(userUpdate.getUsername(), userUpdate.getName(), userUpdate.getSex(), userUpdate.getSurname()) && userUpdate.getBirthDate().toLocalDate().isBefore(LocalDate.now().minus(14, ChronoUnit.YEARS))) {
                 User dbUser = tokenRepository.findByToken(userUpdate.getToken()).getUser();
                 dbUser.setBirthDate(userUpdate.getBirthDate());
                 dbUser.setUsername(userUpdate.getUsername());

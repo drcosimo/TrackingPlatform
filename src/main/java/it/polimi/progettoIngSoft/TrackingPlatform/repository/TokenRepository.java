@@ -9,6 +9,6 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
     public Token findByUser(User user);
     public Token findByToken(String token);
 
-    @Query("select t.user from Token t where t = :token")
+    @Query("select t.user from Token t where t.token = :token")
     public User getUserByToken( String token);
 }
