@@ -4,6 +4,7 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ChangeEmailDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.LoginDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ResetPasswordDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UserDto;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Token;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.Guest;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.TokenRepository;
@@ -90,7 +91,8 @@ public class UserService {
 
     public UserDto login(LoginDto credentials) {
         User user = userRepository.getByEmailAndPassword(credentials.getEmail(), credentials.getPassword());
-        if (user == null || !tokenService.isUserEnabled(user.getToken().getToken())) {
+        Token token = tokenRepository.findByUser(user);
+        if (user == null || (token != null && !tokenService.isUserEnabled(token.getToken()))) {
             return null;
         }
         else {

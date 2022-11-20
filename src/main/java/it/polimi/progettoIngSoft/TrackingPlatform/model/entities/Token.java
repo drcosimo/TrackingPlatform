@@ -23,7 +23,7 @@ public class Token {
     private String token;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "id_user")
     private User user;
 
     @Column(nullable = false)

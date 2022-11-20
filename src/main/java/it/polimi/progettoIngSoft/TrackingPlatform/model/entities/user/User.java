@@ -8,6 +8,7 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Project;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -59,7 +60,7 @@ public abstract class User {
     @ManyToMany(mappedBy = "users")
     private List<Reaction> reactions;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private Token token;
 
     public abstract boolean isAdmin();
