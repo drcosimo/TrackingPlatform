@@ -6,6 +6,7 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.image.PostImage
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.reaction.Reaction;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -65,11 +66,11 @@ public abstract class Post {
     )
     private List<User> partecipants;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_image")
     private List<PostImage> postImages;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_track")
     private List<Track> tracks;
 
@@ -81,7 +82,7 @@ public abstract class Post {
     )
     private List<Reaction> reactions;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_comment")
     private List<Comment> comments;
 

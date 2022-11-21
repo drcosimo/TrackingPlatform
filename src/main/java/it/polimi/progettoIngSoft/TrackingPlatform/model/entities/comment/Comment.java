@@ -2,6 +2,7 @@ package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import java.time.Instant;
 import java.util.List;
 
@@ -34,9 +36,14 @@ public class Comment {
     @Column(nullable = false)
     private boolean visible = true;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_comment_reply")
     private List<CommentReply> replies = null;
+
+    @PrePersist
+    private void preSave() {
+        creationTime = Instant.now();
+    }
 
     public Comment() {
     }
