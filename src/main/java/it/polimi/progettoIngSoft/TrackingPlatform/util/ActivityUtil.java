@@ -3,18 +3,19 @@ package it.polimi.progettoIngSoft.TrackingPlatform.util;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Activity;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.RequestActivityDto;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.ActivityProject;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class ActivityUtil {
 
-    public static boolean isNotInConflict (RequestActivityDto toCheck, List<Activity> activities) {
+    public static boolean isNotInConflict (RequestActivityDto toCheck, List<ActivityProject> activities) {
         if(activities == null || activities.isEmpty() || toCheck == null || (toCheck.getEndDate() == null && toCheck.getBeginDate() == null)) {
             return true;
         }
         else {
-            Iterator<Activity> activityCounter = activities.iterator();
+            Iterator<ActivityProject> activityCounter = activities.iterator();
             boolean isValid = true;
             if (!toCheck.getEndDate().isAfter(toCheck.getBeginDate())) {
                 isValid = false;

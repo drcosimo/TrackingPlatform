@@ -4,6 +4,7 @@ import it.polimi.progettoIngSoft.TrackingPlatform.controller.interfaces.Activity
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ActivityDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ProjectActivitiesRequest;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.RequestActivityDto;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UpdatePermissionsDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.service.ActivityService;
 import it.polimi.progettoIngSoft.TrackingPlatform.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(origins="*")
+//this layer checks token and body nullity
 public class ActivityControllerImpl implements ActivityController {
 
     @Autowired
@@ -69,5 +71,35 @@ public class ActivityControllerImpl implements ActivityController {
         }
         else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
+    }
+
+    @Override
+    public ResponseEntity<Boolean> addActivityCreatorPermissions(UpdatePermissionsDto request) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Boolean> removeActivityCreatorPermissions(UpdatePermissionsDto request) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Boolean> addActivityAdminPermissions(UpdatePermissionsDto request) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Boolean> removeActivityAdminPermissions(UpdatePermissionsDto request) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Boolean> addActivityPartecipants(UpdatePermissionsDto request) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Boolean> removeActivityPartecipants(UpdatePermissionsDto request) {
+        return null;
     }
 }
