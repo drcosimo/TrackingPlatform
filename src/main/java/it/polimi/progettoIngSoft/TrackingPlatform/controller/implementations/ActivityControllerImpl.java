@@ -1,5 +1,6 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.controller.implementations;
 
+import com.google.common.base.Preconditions;
 import it.polimi.progettoIngSoft.TrackingPlatform.controller.interfaces.ActivityController;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ActivityDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ProjectActivitiesRequest;
@@ -29,77 +30,159 @@ public class ActivityControllerImpl implements ActivityController {
 
     @Override
     public ResponseEntity<ActivityDto> createActivity (RequestActivityDto requestActivityDto) {
-        if(requestActivityDto != null && tokenService.isUserEnabled(requestActivityDto.getToken())) {
-                ActivityDto response = activityService.createActivity(requestActivityDto);
-                if(response != null) {
-                    return new ResponseEntity<>(
-                            response,
-                            HttpStatus.OK
-                    );
-                }
-                else return ResponseEntity.badRequest().build();
+        try {
+            Preconditions.checkArgument(requestActivityDto != null && tokenService.isUserEnabled(requestActivityDto.getToken()),
+                    "preconditions failed");
+            ActivityDto response = activityService.createActivity(requestActivityDto);
+            Preconditions.checkNotNull(response, "response null");
+            return new ResponseEntity<>(
+                    response,
+                    HttpStatus.OK
+            );
         }
-        else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
     }
 
     @Override
     public ResponseEntity<ActivityDto> updateActivityDetails(RequestActivityDto updatedActivity) {
-        if(updatedActivity != null && tokenService.isUserEnabled(updatedActivity.getToken())) {
-                ActivityDto response = activityService.updateActivity(updatedActivity);
-                if(response != null) {
-                    return new ResponseEntity<>(
-                            response,
-                            HttpStatus.OK
-                    );
-                }
-                else return ResponseEntity.badRequest().build();
+        try {
+            Preconditions.checkArgument(updatedActivity != null && tokenService.isUserEnabled(updatedActivity.getToken()),
+                    "preconditions failed");
+            ActivityDto response = activityService.updateActivity(updatedActivity);
+            Preconditions.checkNotNull(response, "response null");
+            return new ResponseEntity<>(
+                    response,
+                    HttpStatus.OK
+            );
+
         }
-        else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> deleteActivity(ProjectActivitiesRequest deleteDto) {
+        try {
+            Preconditions.checkArgument(deleteDto != null && tokenService.isUserEnabled(deleteDto.getToken()));
+            String response = activityService.deleteActivity(deleteDto);
+            Preconditions.checkNotNull(response, "response null");
+            return new ResponseEntity(
+                    response,
+                    HttpStatus.OK
+            );
+        }
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
     }
 
     @Override
     public ResponseEntity<List<ActivityDto>> getActivitiesFromProject(ProjectActivitiesRequest projectActivitiesRequest) {
-        if(projectActivitiesRequest != null && tokenService.isUserEnabled(projectActivitiesRequest.getToken())) {
-                List<ActivityDto> response = activityService.getActivitiesFromProject(projectActivitiesRequest);
-                if(response != null && !response.isEmpty()) {
-                    return new ResponseEntity<>(
-                            response,
-                            HttpStatus.OK
-                    );
-                }
-                else return ResponseEntity.badRequest().build();
+        try {
+            Preconditions.checkArgument(projectActivitiesRequest != null && tokenService.isUserEnabled(projectActivitiesRequest.getToken()),
+                    "preconditions failed");
+            List<ActivityDto> response = activityService.getActivitiesFromProject(projectActivitiesRequest);
+            Preconditions.checkNotNull(response, "response null");
+            if(!response.isEmpty()) {
+                return new ResponseEntity<>(
+                        response,
+                        HttpStatus.OK
+                );
+            }
+            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
 
     }
 
     @Override
-    public ResponseEntity<Boolean> addActivityCreatorPermissions(UpdatePermissionsDto request) {
-        return null;
+    public ResponseEntity<String> addActivityCreatorPermissions(UpdatePermissionsDto request) {
+        try {
+            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
+                    "preconditions failed");
+            String response = activityService.addActivityCreatorPermissions(request);
+            Preconditions.checkNotNull(response, "response null");
+            return new ResponseEntity(
+                    response,
+                    HttpStatus.OK
+            );
+        }
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
     }
 
     @Override
-    public ResponseEntity<Boolean> removeActivityCreatorPermissions(UpdatePermissionsDto request) {
-        return null;
+    public ResponseEntity<String> removeActivityCreatorPermissions(UpdatePermissionsDto request) {
+        try {
+            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
+                    "preconditions failed");
+            String response = activityService.removeActivityCreatorPermissions(request);
+            Preconditions.checkNotNull(response, "response null");
+            return new ResponseEntity(
+                    response,
+                    HttpStatus.OK
+            );
+        }
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
     }
 
     @Override
-    public ResponseEntity<Boolean> addActivityAdminPermissions(UpdatePermissionsDto request) {
-        return null;
+    public ResponseEntity<String> addActivityAdminPermissions(UpdatePermissionsDto request) {
+        try {
+            return null;
+        }
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
     }
 
     @Override
-    public ResponseEntity<Boolean> removeActivityAdminPermissions(UpdatePermissionsDto request) {
-        return null;
+    public ResponseEntity<String> removeActivityAdminPermissions(UpdatePermissionsDto request) {
+        try {
+            return null;
+        }
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
     }
 
     @Override
-    public ResponseEntity<Boolean> addActivityPartecipants(UpdatePermissionsDto request) {
-        return null;
+    public ResponseEntity<String> addActivityPartecipants(UpdatePermissionsDto request) {
+        try {
+            return null;
+        }
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
     }
 
     @Override
-    public ResponseEntity<Boolean> removeActivityPartecipants(UpdatePermissionsDto request) {
-        return null;
+    public ResponseEntity<String> removeActivityPartecipants(UpdatePermissionsDto request) {
+        try {
+            return null;
+        }
+        catch (Exception e) {
+            return exceptionReturn(e.getMessage());
+        }
+    }
+
+    private ResponseEntity exceptionReturn(String errorMessage) {
+        switch (errorMessage) {
+            case "preconditions failed" : {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            case "response null" : {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            default: return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

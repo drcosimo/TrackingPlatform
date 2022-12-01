@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
+//every method with a ResponseEntity<String> return type uses the String to describe the error
 @RequestMapping(path = "/activity", produces="application/json" , consumes="application/json")
 public interface ActivityController {
 
@@ -20,25 +21,28 @@ public interface ActivityController {
     @PostMapping("/update")
     public ResponseEntity<ActivityDto> updateActivityDetails(@RequestBody RequestActivityDto updatedActivity);
 
+    @PostMapping("/delete")
+    public ResponseEntity<String> deleteActivity(@RequestBody ProjectActivitiesRequest deleteDto);
+
     @PostMapping("/getProjectActivities/")
     public ResponseEntity<List<ActivityDto>> getActivitiesFromProject(@RequestBody ProjectActivitiesRequest projectActivitiesRequest);
 
     @PostMapping("/addActivityCreatorPermissions")
-    public ResponseEntity<Boolean> addActivityCreatorPermissions(@RequestBody UpdatePermissionsDto request);
+    public ResponseEntity<String> addActivityCreatorPermissions(@RequestBody UpdatePermissionsDto request);
 
     @PostMapping("/removeActivityCreatorPermissions")
-    public ResponseEntity<Boolean> removeActivityCreatorPermissions(@RequestBody UpdatePermissionsDto request);
+    public ResponseEntity<String> removeActivityCreatorPermissions(@RequestBody UpdatePermissionsDto request);
 
     @PostMapping("/addActivityAdminPermissions")
-    public ResponseEntity<Boolean> addActivityAdminPermissions(@RequestBody UpdatePermissionsDto request);
+    public ResponseEntity<String> addActivityAdminPermissions(@RequestBody UpdatePermissionsDto request);
 
     @PostMapping("/removeActivityAdminPermissions")
-    public ResponseEntity<Boolean> removeActivityAdminPermissions(@RequestBody UpdatePermissionsDto request);
+    public ResponseEntity<String> removeActivityAdminPermissions(@RequestBody UpdatePermissionsDto request);
 
     @PostMapping("/addActivityPartecipants")
-    public ResponseEntity<Boolean> addActivityPartecipants(@RequestBody UpdatePermissionsDto request);
+    public ResponseEntity<String> addActivityPartecipants(@RequestBody UpdatePermissionsDto request);
 
     @PostMapping("/removeActivityPartecipants")
-    public ResponseEntity<Boolean> removeActivityPartecipants(@RequestBody UpdatePermissionsDto request);
+    public ResponseEntity<String> removeActivityPartecipants(@RequestBody UpdatePermissionsDto request);
 
 }

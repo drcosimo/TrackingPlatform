@@ -19,6 +19,7 @@ public class ActivityProject extends Activity{
         setBeginDate(beginDate);
         setEndDate(endDate);
         setVehicles(vehicles);
+        //initial setting of creator's permissions
         setCreators(List.of(creator));
         setAdmins(List.of(creator));
     }
