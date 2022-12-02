@@ -14,6 +14,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     public User findByEmail(String oldEmail);
 
-    @Query("select u from User u where u.username in :usernames")
-    public List<User> getAllByUsernames(List<String> usernames);
+    //retrieving of every user in the list if everyone exists
+    @Query("select u from User u " +
+            "where u.username in :usernames and " +
+            "((select count(u1) from User u1 where u1.username in :usernames) = :numberOfUsernames)")
+    public List<User> getAllByUsernamesIfExist(List<String> usernames, Integer numberOfUsernames);
 }
