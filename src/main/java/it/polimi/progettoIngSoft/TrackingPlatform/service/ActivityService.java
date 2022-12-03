@@ -50,26 +50,51 @@ public class ActivityService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    
+    private final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_ = "user does not have permission to ";
 
-    //TODO refactor the permission check by contains method
+    private final String ACTIVITY_NAME_CANNOT_BE_EMPTY = "activity name cannot be empty";
+    private final String USER_NOT_FOUND = "user not found";
+    private final String CREATE_AN_ACTIVITY_IN_THIS_PROJECT= "create an activity in this project";
+    private final String THE_NEW_ACTIVITY_IS_IN_CONFLICTS_WITH_ANOTHER_ACTIVITY = "the new activity is in conflict with another activity";
+    private final String SELECTED_VEHICLES_ARE_NOT_AVAILABLE = "selected vehicles are not available";
+    private final String UPDATE_THIS_ACTIVITY = "update this activity";
+    private final String THE_ACTIVITY_IS_NOT_PART_OF_THE_PROJECT = "the activity is not part of the project";
+    private final String NEW_ACTIVITY_DATES_ARE_IN_CONFLICT_WITH_OTHER_ACTIVITIES = "new activity dates are in conflict with other activities";
+    private final String THE_PROJECT_ID_CANNOT_BE_NULL = "the project id cannot be null";
+    private final String THIS_PROJECT_HAS_NO_ACTIVITIES = "this project has no activities";
+    private final String THE_ACTIVITY_ID_CANNOT_BE_NULL = "the activity id cannot be null";
+    private final String DELETE_THIS_ACTIVITY = "delete this activity";
+    private final String THE_LIST_OF_USERNAMES_IS_EMPTY = "the list of usernames is empty";
+    private final String ADD_CREATORS_TO_THIS_ACTIVITY = "add creators to this activity";
+    private final String NOT_EVERY_SPECIFIED_USERNAME_EXISTS = "not every specified username exists";
+    private final String REMOVE_CREATORS_FROM_THIS_ACTIVITY = "remove creators from this activity";
+    private final String ADD_ADMINS_TO_THIS_ACTIVITY = "add admins to this activity";
+    private final String REMOVE_ADMINS_FROM_THIS_ACTIVITY = "remove admins from this activity";
+    private final String ADD_PARTECIPANTS_TO_THIS_ACTIVITY = "add partecipants to this activity";
+    private final String REMOVE_PARTECIPANTS_FROM_THIS_ACTIVITY = "remove partecipants from this activity";
+    
+    
     public ActivityDto createActivity(RequestActivityDto requestActivityDto) {
         try {
             //check the minimum required field to create an activity
-            Preconditions.checkArgument(StringUtils.isNotEmpty(requestActivityDto.getName()), "activity name cannot be empty");
+            Preconditions.checkArgument(StringUtils.isNotEmpty(requestActivityDto.getName()), ACTIVITY_NAME_CANNOT_BE_EMPTY);
+            //
             Preconditions.checkArgument(
                     requestActivityDto.getVehiclesIds() == null || vehicleService.checkVehiclesExistence(requestActivityDto.getVehiclesIds()),
-                    "vehicles selected are wrong");
+                    SELECTED_VEHICLES_ARE_NOT_AVAILABLE);
             User user = tokenRepository.getUserByToken(requestActivityDto.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             //different cases based on the type of request (if it's an activityProject or an activityPost creation)
 
             //activityProject case
             if (requestActivityDto.getProjectId() != null && requestActivityDto.getProjectId() > 0) {
                 Project project = projectRepository.findById(requestActivityDto.getProjectId()).get();
                 //check if the user is an admin of the activity's project
-                Preconditions.checkArgument(project.getAdmins().contains(user), "you don't have permissions to create an activity in this project");
+                Preconditions.checkArgument(project.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + CREATE_AN_ACTIVITY_IN_THIS_PROJECT);
                 List<ActivityProject> existingActivities = projectRepository.getProjectActivitiesById(requestActivityDto.getProjectId());
-                Preconditions.checkArgument(ActivityUtil.isNotInConflict(requestActivityDto, existingActivities), "the new activity is in conflict with another activity");
+                Preconditions.checkArgument(ActivityUtil.isNotInConflict(requestActivityDto, existingActivities), THE_NEW_ACTIVITY_IS_IN_CONFLICTS_WITH_ANOTHER_ACTIVITY);
 
                 ActivityProject activity = activityProjectRepository.save(new ActivityProject(requestActivityDto.getName(), requestActivityDto.getDescription(), requestActivityDto.getBeginDate(), requestActivityDto.getEndDate(), vehicleService.getAllByIds(requestActivityDto.getVehiclesIds()), user));
                 project.getActivities().add(activity);
@@ -87,20 +112,20 @@ public class ActivityService {
 
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "activity name cannot be empty": {
-                    return new ActivityDto("activity name cannot be empty");
+                case ACTIVITY_NAME_CANNOT_BE_EMPTY: {
+                    return new ActivityDto(ACTIVITY_NAME_CANNOT_BE_EMPTY);
                 }
-                case "vehicles selected are wrong": {
-                    return new ActivityDto("vehicles selected are wrong");
+                case SELECTED_VEHICLES_ARE_NOT_AVAILABLE: {
+                    return new ActivityDto(SELECTED_VEHICLES_ARE_NOT_AVAILABLE);
                 }
-                case "user not found": {
-                    return new ActivityDto("user not found");
+                case USER_NOT_FOUND: {
+                    return new ActivityDto(USER_NOT_FOUND);
                 }
-                case "the new activity is in conflict with another activity": {
-                    return new ActivityDto("the new activity is in conflict with another activity");
+                case THE_NEW_ACTIVITY_IS_IN_CONFLICTS_WITH_ANOTHER_ACTIVITY: {
+                    return new ActivityDto(THE_NEW_ACTIVITY_IS_IN_CONFLICTS_WITH_ANOTHER_ACTIVITY);
                 }
-                case "you don't have permissions to create an activity in this project": {
-                    return new ActivityDto(("you don't have permissions to create an activity in this project"));
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + CREATE_AN_ACTIVITY_IN_THIS_PROJECT: {
+                    return new ActivityDto((USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + CREATE_AN_ACTIVITY_IN_THIS_PROJECT));
                 }
                 default:
                     return null;
@@ -110,14 +135,14 @@ public class ActivityService {
 
     public ActivityDto updateActivity(RequestActivityDto updatedActivityDto) {
         try {
-            Preconditions.checkArgument(StringUtils.isNotEmpty(updatedActivityDto.getName()), "activity name cannot be empty");
+            Preconditions.checkArgument(StringUtils.isNotEmpty(updatedActivityDto.getName()), ACTIVITY_NAME_CANNOT_BE_EMPTY);
             Preconditions.checkArgument(updatedActivityDto.getVehiclesIds() == null || vehicleService.checkVehiclesExistence(updatedActivityDto.getVehiclesIds()),
-                    "selected vehicles are not available");
+                    SELECTED_VEHICLES_ARE_NOT_AVAILABLE);
             User user = tokenRepository.getUserByToken(updatedActivityDto.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             Activity activity = activityRepository.findById(updatedActivityDto.getId()).get();
             //check if the user is an admin of the activity
-            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have permissions to update this activity");
+            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + UPDATE_THIS_ACTIVITY);
 
             //different cases based on the type of request (if it's an activityProject or an activityPost creation)
 
@@ -133,13 +158,13 @@ public class ActivityService {
                     }
                 }
                 //check that the activity matches with its project
-                Preconditions.checkArgument(isContained, "the activity is not part of the project");
+                Preconditions.checkArgument(isContained, THE_ACTIVITY_IS_NOT_PART_OF_THE_PROJECT);
                 //check if dates have been updated or not
                 if (!activity.getBeginDate().equals(updatedActivityDto.getBeginDate()) || !activity.getEndDate().equals(updatedActivityDto.getEndDate())) {
                     //if the dates have been updated, i check the conflict with other project's activities
                     List<ActivityProject> existingActivities = projectRepository.getProjectActivitiesById(activity.getId());
                     Preconditions.checkArgument(ActivityUtil.isNotInConflict(updatedActivityDto, existingActivities),
-                            "new activity dates are in conflict with other activities");
+                            NEW_ACTIVITY_DATES_ARE_IN_CONFLICT_WITH_OTHER_ACTIVITIES);
                 }
             }
 
@@ -154,23 +179,23 @@ public class ActivityService {
 
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "activity name cannot be empty": {
-                    return new ActivityDto("activity name cannot be empty");
+                case ACTIVITY_NAME_CANNOT_BE_EMPTY: {
+                    return new ActivityDto(ACTIVITY_NAME_CANNOT_BE_EMPTY);
                 }
-                case "selected vehicles are not available": {
-                    return new ActivityDto("selected vehicles are not available");
+                case SELECTED_VEHICLES_ARE_NOT_AVAILABLE: {
+                    return new ActivityDto(SELECTED_VEHICLES_ARE_NOT_AVAILABLE);
                 }
-                case "you don't have permissions to update this activity": {
-                    return new ActivityDto("you don't have permissions to update this activity");
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + UPDATE_THIS_ACTIVITY: {
+                    return new ActivityDto(USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + UPDATE_THIS_ACTIVITY);
                 }
-                case "the activity is not part of the project": {
-                    return new ActivityDto("the activity is not part of the project");
+                case THE_ACTIVITY_IS_NOT_PART_OF_THE_PROJECT: {
+                    return new ActivityDto(THE_ACTIVITY_IS_NOT_PART_OF_THE_PROJECT);
                 }
-                case "new activity dates are in conflict with other activities": {
-                    return new ActivityDto("new activity dates are in conflict with other activities");
+                case NEW_ACTIVITY_DATES_ARE_IN_CONFLICT_WITH_OTHER_ACTIVITIES: {
+                    return new ActivityDto(NEW_ACTIVITY_DATES_ARE_IN_CONFLICT_WITH_OTHER_ACTIVITIES);
                 }
-                case "user not found": {
-                    return new ActivityDto("user not found");
+                case USER_NOT_FOUND: {
+                    return new ActivityDto(USER_NOT_FOUND);
                 }
                 default:
                     return null;
@@ -181,10 +206,10 @@ public class ActivityService {
     public List<ActivityDto> getActivitiesFromProject(ProjectActivitiesRequest projectActivitiesRequest) {
         try {
             User user = tokenRepository.getUserByToken(projectActivitiesRequest.getToken());
-            Preconditions.checkNotNull(user, "user not found");
-            Preconditions.checkNotNull(projectActivitiesRequest.getProjectId(), "the project id cannot be null");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
+            Preconditions.checkNotNull(projectActivitiesRequest.getProjectId(), THE_PROJECT_ID_CANNOT_BE_NULL);
             List<ActivityProject> projectActivities = projectRepository.getProjectActivitiesById(projectActivitiesRequest.getProjectId());
-            Preconditions.checkArgument(!projectActivities.isEmpty(), "this project has no activities");
+            Preconditions.checkArgument(!projectActivities.isEmpty(), THIS_PROJECT_HAS_NO_ACTIVITIES);
             Iterator<ActivityProject> activityCounter = projectActivities.listIterator();
             List<ActivityDto> returnList = List.of();
             while (activityCounter.hasNext()) {
@@ -193,13 +218,13 @@ public class ActivityService {
             return returnList;
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "user not found": {
-                    return List.of(new ActivityDto("user not found"));
+                case USER_NOT_FOUND: {
+                    return List.of(new ActivityDto(USER_NOT_FOUND));
                 }
-                case "the project id cannot be null": {
-                    return List.of(new ActivityDto("the project id cannot be null"));
+                case THE_PROJECT_ID_CANNOT_BE_NULL: {
+                    return List.of(new ActivityDto(THE_PROJECT_ID_CANNOT_BE_NULL));
                 }
-                case "this project has no activities": {
+                case THIS_PROJECT_HAS_NO_ACTIVITIES: {
                     return List.of();
                 }
                 default:
@@ -210,24 +235,24 @@ public class ActivityService {
 
     public String deleteActivity(ProjectActivitiesRequest deleteDto) {
         try {
-            Preconditions.checkNotNull(deleteDto.getProjectId(), "the activity id cannot be null");
+            Preconditions.checkNotNull(deleteDto.getProjectId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
             User user = tokenRepository.getUserByToken(deleteDto.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             Activity activity = activityRepository.findById(deleteDto.getProjectId()).get();
-            Preconditions.checkArgument(activity.getCreators().contains(user), "you don't have the permission to delete this activity");
+            Preconditions.checkArgument(activity.getCreators().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + DELETE_THIS_ACTIVITY);
             activity.setVisible(false);
             activityRepository.save(activity);
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null": {
-                    return "the activity id cannot be null";
+                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
+                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
                 }
-                case "user not found": {
-                    return "user not found";
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
                 }
-                case "you don't have the permission to delete this activity": {
-                    return "you don't have the permission to delete this activity";
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + DELETE_THIS_ACTIVITY: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + DELETE_THIS_ACTIVITY;
                 }
                 default:
                     return null;
@@ -237,20 +262,20 @@ public class ActivityService {
 
     public String addActivityCreatorPermissions(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), "the activity id cannot be null");
-            Preconditions.checkArgument(!request.getUsernames().isEmpty(), "the list of usernames is empty");
+            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
+            Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             User user = tokenRepository.getUserByToken(request.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             Activity activity = activityRepository.findById(request.getActivityId()).get();
             //check if the user has permissions to add a creator
-            Preconditions.checkArgument(activity.getCreators().contains(user), "you don't have the permission to add creators to this activity");
+            Preconditions.checkArgument(activity.getCreators().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_CREATORS_TO_THIS_ACTIVITY);
             //the system ignores if the user wants to add a creator that already exists
 
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
-                    "not every specified username exists");
+                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
 
             List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
             for (User u : usersToAdd) {
@@ -263,20 +288,20 @@ public class ActivityService {
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null": {
-                    return "the activity id cannot be null";
+                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
+                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
                 }
-                case "user not found": {
-                    return "user not found";
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
                 }
-                case "you don't have the permission to add creators to this activity": {
-                    return "you don't have the permission to add creators to this activity";
+                case ADD_CREATORS_TO_THIS_ACTIVITY: {
+                    return ADD_CREATORS_TO_THIS_ACTIVITY;
                 }
-                case "the list of usernames is empty": {
-                    return "the list of usernames is empty";
+                case THE_LIST_OF_USERNAMES_IS_EMPTY: {
+                    return THE_LIST_OF_USERNAMES_IS_EMPTY;
                 }
-                case "not every specified username exists": {
-                    return "not every specified username exists";
+                case NOT_EVERY_SPECIFIED_USERNAME_EXISTS: {
+                    return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
                 }
                 default:
                     return null;
@@ -286,18 +311,18 @@ public class ActivityService {
 
     public String removeActivityCreatorPermissions(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), "the activity id cannot be null");
+            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
             User user = tokenRepository.getUserByToken(request.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             Activity activity = activityRepository.findById(request.getActivityId()).get();
             //check if the user has permissions to add a creator
-            Preconditions.checkArgument(activity.getCreators().contains(user), "you don't have the permission to remove creators from this activity");
+            Preconditions.checkArgument(activity.getCreators().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ACTIVITY);
 
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
-                    "not every specified username exists");
+                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
             Iterator<User> userIterator = activity.getCreators().iterator();
             //removes all the specified users if they are contained in the creators list
             User userToAnalize;
@@ -316,14 +341,14 @@ public class ActivityService {
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null": {
-                    return "the activity id cannot be null";
+                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
+                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
                 }
-                case "user not found": {
-                    return "user not found";
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
                 }
-                case "you don't have the permission to remove creators from this activity": {
-                    return "you don't have the permission to remove creators from this activity";
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ACTIVITY: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ACTIVITY;
                 }
                 default:
                     return null;
@@ -333,20 +358,20 @@ public class ActivityService {
 
     public String addActivityAdminPermissions(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), "the activity id cannot be null");
-            Preconditions.checkArgument(!request.getUsernames().isEmpty(), "the list of usernames is empty");
+            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
+            Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             User user = tokenRepository.getUserByToken(request.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             Activity activity = activityRepository.findById(request.getActivityId()).get();
             //check if the user has permissions to add an admin
-            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have the permission to add admins to this activity");
+            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_ADMINS_TO_THIS_ACTIVITY);
             //the system ignores if the user wants to add an admin that already exists
 
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
-                    "not every specified username exists");
+                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
 
             List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
             for (User u : usersToAdd) {
@@ -359,20 +384,20 @@ public class ActivityService {
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null": {
-                    return "the activity id cannot be null";
+                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
+                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
                 }
-                case "user not found": {
-                    return "user not found";
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
                 }
-                case "you don't have the permission to add admins to this activity": {
-                    return "you don't have the permission to add admins to this activity";
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_ADMINS_TO_THIS_ACTIVITY: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_ADMINS_TO_THIS_ACTIVITY;
                 }
-                case "the list of usernames is empty": {
-                    return "the list of usernames is empty";
+                case THE_LIST_OF_USERNAMES_IS_EMPTY: {
+                    return THE_LIST_OF_USERNAMES_IS_EMPTY;
                 }
-                case "not every specified username exists": {
-                    return "not every specified username exists";
+                case NOT_EVERY_SPECIFIED_USERNAME_EXISTS: {
+                    return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
                 }
                 default:
                     return null;
@@ -382,18 +407,18 @@ public class ActivityService {
 
     public String removeActivityAdminPermissions(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), "the activity id cannot be null");
+            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
             User user = tokenRepository.getUserByToken(request.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             Activity activity = activityRepository.findById(request.getActivityId()).get();
             //check if the user has permissions to remove an admin
-            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have the permission to remove admins from this activity");
+            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_ADMINS_FROM_THIS_ACTIVITY);
 
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
-                    "not every specified username exists");
+                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
 
             Iterator<User> userIterator = activity.getAdmins().iterator();
             //removes all the specified users if they are contained in the admins list
@@ -414,14 +439,14 @@ public class ActivityService {
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null": {
-                    return "the activity id cannot be null";
+                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
+                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
                 }
-                case "user not found": {
-                    return "user not found";
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
                 }
-                case "you don't have the permission to remove admins from this activity": {
-                    return "you don't have the permission to remove admins from this activity";
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_ADMINS_FROM_THIS_ACTIVITY: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_ADMINS_FROM_THIS_ACTIVITY;
                 }
                 default:
                     return null;
@@ -431,19 +456,19 @@ public class ActivityService {
 
     public String addActivityPartecipants(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), "the activity id cannot be null");
-            Preconditions.checkArgument(!request.getUsernames().isEmpty(), "the list of usernames is empty");
+            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
+            Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             User user = tokenRepository.getUserByToken(request.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             Activity activity = activityRepository.findById(request.getActivityId()).get();
             //check if the user has permissions to add a partecipant
-            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have the permission to add partecipants to this activity");
+            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ACTIVITY);
 
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
-                    "not every specified username exists");
+                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
 
             //the system ignores if the user wants to add a partecipant that already exists
             List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
@@ -457,20 +482,20 @@ public class ActivityService {
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null": {
-                    return "the activity id cannot be null";
+                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
+                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
                 }
-                case "user not found": {
-                    return "user not found";
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
                 }
-                case "you don't have the permission to add partecipants to this activity": {
-                    return "you don't have the permission to add partecipants to this activity";
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ACTIVITY: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ACTIVITY;
                 }
-                case "the list of usernames is empty": {
-                    return "the list of usernames is empty";
+                case THE_LIST_OF_USERNAMES_IS_EMPTY: {
+                    return THE_LIST_OF_USERNAMES_IS_EMPTY;
                 }
-                case "not every specified username exists": {
-                    return "not every specified username exists";
+                case NOT_EVERY_SPECIFIED_USERNAME_EXISTS: {
+                    return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
                 }
                 default:
                     return null;
@@ -480,18 +505,18 @@ public class ActivityService {
 
     public String removeActivityPartecipants(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), "the activity id cannot be null");
+            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
             User user = tokenRepository.getUserByToken(request.getToken());
-            Preconditions.checkNotNull(user, "user not found");
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
             Activity activity = activityRepository.findById(request.getActivityId()).get();
             //check if the user has permissions to remove a partecipant
-            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have the permission to remove partecipants from this activity");
+            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ACTIVITY);
 
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
-                    "not every specified username exists");
+                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
 
             Iterator<User> userIterator = activity.getPartecipants().iterator();
             //removes all the specified users if they are contained in the partecipants list
@@ -506,14 +531,14 @@ public class ActivityService {
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null": {
-                    return "the activity id cannot be null";
+                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
+                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
                 }
-                case "user not found": {
-                    return "user not found";
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
                 }
-                case "you don't have the permission to remove partecipants from this activity": {
-                    return "you don't have the permission to remove partecipants from this activity";
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ACTIVITY: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ACTIVITY;
                 }
                 default:
                     return null;

@@ -27,14 +27,16 @@ public class ActivityControllerImpl implements ActivityController {
     @Autowired
     private TokenService tokenService;
 
-
+    private final String PRECONDITIONS_FAILED = "preconditions failed";
+    private final String RESPONSE_NULL = "response null"; 
+    
     @Override
     public ResponseEntity<ActivityDto> createActivity (RequestActivityDto requestActivityDto) {
         try {
             Preconditions.checkArgument(requestActivityDto != null && tokenService.isUserEnabled(requestActivityDto.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             ActivityDto response = activityService.createActivity(requestActivityDto);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity<>(
                     response,
                     HttpStatus.OK
@@ -49,9 +51,9 @@ public class ActivityControllerImpl implements ActivityController {
     public ResponseEntity<ActivityDto> updateActivityDetails(RequestActivityDto updatedActivity) {
         try {
             Preconditions.checkArgument(updatedActivity != null && tokenService.isUserEnabled(updatedActivity.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             ActivityDto response = activityService.updateActivity(updatedActivity);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity<>(
                     response,
                     HttpStatus.OK
@@ -68,7 +70,7 @@ public class ActivityControllerImpl implements ActivityController {
         try {
             Preconditions.checkArgument(deleteDto != null && tokenService.isUserEnabled(deleteDto.getToken()));
             String response = activityService.deleteActivity(deleteDto);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity(
                     response,
                     HttpStatus.OK
@@ -83,9 +85,9 @@ public class ActivityControllerImpl implements ActivityController {
     public ResponseEntity<List<ActivityDto>> getActivitiesFromProject(ProjectActivitiesRequest projectActivitiesRequest) {
         try {
             Preconditions.checkArgument(projectActivitiesRequest != null && tokenService.isUserEnabled(projectActivitiesRequest.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             List<ActivityDto> response = activityService.getActivitiesFromProject(projectActivitiesRequest);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             if(!response.isEmpty()) {
                 return new ResponseEntity<>(
                         response,
@@ -104,9 +106,9 @@ public class ActivityControllerImpl implements ActivityController {
     public ResponseEntity<String> addActivityCreatorPermissions(UpdatePermissionsDto request) {
         try {
             Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             String response = activityService.addActivityCreatorPermissions(request);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity(
                     response,
                     HttpStatus.OK
@@ -121,9 +123,9 @@ public class ActivityControllerImpl implements ActivityController {
     public ResponseEntity<String> removeActivityCreatorPermissions(UpdatePermissionsDto request) {
         try {
             Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             String response = activityService.removeActivityCreatorPermissions(request);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity(
                     response,
                     HttpStatus.OK
@@ -138,9 +140,9 @@ public class ActivityControllerImpl implements ActivityController {
     public ResponseEntity<String> addActivityAdminPermissions(UpdatePermissionsDto request) {
         try {
             Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             String response = activityService.addActivityAdminPermissions(request);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity(
                     response,
                     HttpStatus.OK
@@ -155,9 +157,9 @@ public class ActivityControllerImpl implements ActivityController {
     public ResponseEntity<String> removeActivityAdminPermissions(UpdatePermissionsDto request) {
         try {
             Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             String response = activityService.removeActivityAdminPermissions(request);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity(
                     response,
                     HttpStatus.OK
@@ -172,9 +174,9 @@ public class ActivityControllerImpl implements ActivityController {
     public ResponseEntity<String> addActivityPartecipants(UpdatePermissionsDto request) {
         try {
             Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             String response = activityService.addActivityPartecipants(request);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity(
                     response,
                     HttpStatus.OK
@@ -189,9 +191,9 @@ public class ActivityControllerImpl implements ActivityController {
     public ResponseEntity<String> removeActivityPartecipants(UpdatePermissionsDto request) {
         try {
             Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    "preconditions failed");
+                    PRECONDITIONS_FAILED);
             String response = activityService.removeActivityPartecipants(request);
-            Preconditions.checkNotNull(response, "response null");
+            Preconditions.checkNotNull(response, RESPONSE_NULL);
             return new ResponseEntity(
                     response,
                     HttpStatus.OK
@@ -204,10 +206,10 @@ public class ActivityControllerImpl implements ActivityController {
 
     private ResponseEntity exceptionReturn(String errorMessage) {
         switch (errorMessage) {
-            case "preconditions failed" : {
+            case PRECONDITIONS_FAILED : {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }
-            case "response null" : {
+            case RESPONSE_NULL : {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
             default: return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
