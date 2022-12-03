@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Iterator;
 import java.util.List;
+
 import com.google.common.base.Preconditions;
 
 
@@ -50,6 +51,7 @@ public class ActivityService {
     @Autowired
     private UserRepository userRepository;
 
+    //TODO refactor the permission check by contains method
     public ActivityDto createActivity(RequestActivityDto requestActivityDto) {
         try {
             //check the minimum required field to create an activity
@@ -65,14 +67,7 @@ public class ActivityService {
             if (requestActivityDto.getProjectId() != null && requestActivityDto.getProjectId() > 0) {
                 Project project = projectRepository.findById(requestActivityDto.getProjectId()).get();
                 //check if the user is an admin of the activity's project
-                boolean found = false;
-                Iterator adminsIterator = project.getAdmins().iterator();
-                while (adminsIterator.hasNext() && !found) {
-                    if (user.equals(adminsIterator.next())) {
-                        found = true;
-                    }
-                }
-                Preconditions.checkArgument(found, "you don't have permissions to create an activity in this project");
+                Preconditions.checkArgument(project.getAdmins().contains(user), "you don't have permissions to create an activity in this project");
                 List<ActivityProject> existingActivities = projectRepository.getProjectActivitiesById(requestActivityDto.getProjectId());
                 Preconditions.checkArgument(ActivityUtil.isNotInConflict(requestActivityDto, existingActivities), "the new activity is in conflict with another activity");
 
@@ -83,16 +78,14 @@ public class ActivityService {
 
             }
             //activityPost case
-            else if(requestActivityDto.getProjectId() == null) {
+            else if (requestActivityDto.getProjectId() == null) {
                 ActivityPost activity = activityPostRepository.save(new ActivityPost(requestActivityDto.getName(), requestActivityDto.getDescription(), requestActivityDto.getBeginDate(), requestActivityDto.getEndDate(), vehicleService.getAllByIds(requestActivityDto.getVehiclesIds()), user));
                 return new ActivityDto(activity);
-            }
-            else {
+            } else {
                 return null;
             }
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             switch (e.getMessage()) {
                 case "activity name cannot be empty": {
                     return new ActivityDto("activity name cannot be empty");
@@ -109,7 +102,8 @@ public class ActivityService {
                 case "you don't have permissions to create an activity in this project": {
                     return new ActivityDto(("you don't have permissions to create an activity in this project"));
                 }
-                default: return null;
+                default:
+                    return null;
             }
         }
     }
@@ -123,14 +117,7 @@ public class ActivityService {
             Preconditions.checkNotNull(user, "user not found");
             Activity activity = activityRepository.findById(updatedActivityDto.getId()).get();
             //check if the user is an admin of the activity
-            boolean found = false;
-            Iterator adminsIterator = activity.getAdmins().iterator();
-            while (adminsIterator.hasNext() && !found) {
-                if (user.equals(adminsIterator.next())) {
-                    found = true;
-                }
-            }
-            Preconditions.checkArgument(found, "you don't have permissions to update this activity");
+            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have permissions to update this activity");
 
             //different cases based on the type of request (if it's an activityProject or an activityPost creation)
 
@@ -141,7 +128,7 @@ public class ActivityService {
                 boolean isContained = false;
                 Iterator<ActivityProject> activityIterator = project.getActivities().iterator();
                 while (activityIterator.hasNext() && !isContained) {
-                    if(activityIterator.next().getId().equals(activity.getId())) {
+                    if (activityIterator.next().getId().equals(activity.getId())) {
                         isContained = true;
                     }
                 }
@@ -165,8 +152,7 @@ public class ActivityService {
             activityRepository.save(activity);
             return new ActivityDto(activity);
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             switch (e.getMessage()) {
                 case "activity name cannot be empty": {
                     return new ActivityDto("activity name cannot be empty");
@@ -186,7 +172,8 @@ public class ActivityService {
                 case "user not found": {
                     return new ActivityDto("user not found");
                 }
-                default: return null;
+                default:
+                    return null;
             }
         }
     }
@@ -215,7 +202,8 @@ public class ActivityService {
                 case "this project has no activities": {
                     return List.of();
                 }
-                default: return null;
+                default:
+                    return null;
             }
         }
     }
@@ -226,30 +214,23 @@ public class ActivityService {
             User user = tokenRepository.getUserByToken(deleteDto.getToken());
             Preconditions.checkNotNull(user, "user not found");
             Activity activity = activityRepository.findById(deleteDto.getProjectId()).get();
-            boolean found = false;
-            Iterator<User> userIterator = activity.getCreators().iterator();
-            while (!found && userIterator.hasNext()) {
-                if(user.equals(userIterator.next())) {
-                    found = true;
-                }
-            }
-            Preconditions.checkArgument(found, "you don't have the permission to delete this activity");
+            Preconditions.checkArgument(activity.getCreators().contains(user), "you don't have the permission to delete this activity");
             activity.setVisible(false);
             activityRepository.save(activity);
             return "";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null" : {
+                case "the activity id cannot be null": {
                     return "the activity id cannot be null";
                 }
-                case "user not found" : {
+                case "user not found": {
                     return "user not found";
                 }
-                case "you don't have the permission to delete this activity" : {
+                case "you don't have the permission to delete this activity": {
                     return "you don't have the permission to delete this activity";
                 }
-                default: return null;
+                default:
+                    return null;
             }
         }
     }
@@ -262,41 +243,43 @@ public class ActivityService {
             Preconditions.checkNotNull(user, "user not found");
             Activity activity = activityRepository.findById(request.getActivityId()).get();
             //check if the user has permissions to add a creator
-            boolean found = false;
-            Iterator<User> userIterator = activity.getCreators().iterator();
-            while (!found && userIterator.hasNext()) {
-                if(user.equals(userIterator.next())) {
-                    found = true;
-                }
-            }
-            Preconditions.checkArgument(found, "you don't have the permission to add creators to this activity");
-            //check that every username exists
+            Preconditions.checkArgument(activity.getCreators().contains(user), "you don't have the permission to add creators to this activity");
             //the system ignores if the user wants to add a creator that already exists
-            List<User> usersToAdd = userRepository.getAllByUsernamesIfExist(request.getUsernames(), request.getUsernames().size());
+
+            //eliminates duplicate strings from the list of usernames
+            List<String> usernames = request.getUsernames().stream().distinct().toList();
+            //check that every username exists
+            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
+                    "not every specified username exists");
+
+            List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
             for (User u : usersToAdd) {
                 //check if the user is not already a creator
-                if(!activity.getCreators().contains(u)) {
+                if (!activity.getCreators().contains(u)) {
                     activity.getCreators().add(u);
                 }
             }
             activityRepository.save(activity);
             return "";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null" : {
+                case "the activity id cannot be null": {
                     return "the activity id cannot be null";
                 }
-                case "user not found" : {
+                case "user not found": {
                     return "user not found";
                 }
-                case "you don't have the permission to add creators to this activity" : {
+                case "you don't have the permission to add creators to this activity": {
                     return "you don't have the permission to add creators to this activity";
                 }
-                case "the list of usernames is empty" : {
+                case "the list of usernames is empty": {
                     return "the list of usernames is empty";
                 }
-                default: return null;
+                case "not every specified username exists": {
+                    return "not every specified username exists";
+                }
+                default:
+                    return null;
             }
         }
     }
@@ -308,39 +291,42 @@ public class ActivityService {
             Preconditions.checkNotNull(user, "user not found");
             Activity activity = activityRepository.findById(request.getActivityId()).get();
             //check if the user has permissions to add a creator
-            boolean found = false;
+            Preconditions.checkArgument(activity.getCreators().contains(user), "you don't have the permission to remove creators from this activity");
+
+            //eliminates duplicate strings from the list of usernames
+            List<String> usernames = request.getUsernames().stream().distinct().toList();
+            //check that every username exists
+            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
+                    "not every specified username exists");
             Iterator<User> userIterator = activity.getCreators().iterator();
-            while (!found && userIterator.hasNext()) {
-                if(user.equals(userIterator.next())) {
-                    found = true;
-                }
-            }
-            Preconditions.checkArgument(found, "you don't have the permission to remove creators from this activity");
-            //renew users list
-            userIterator = activity.getCreators().iterator();
             //removes all the specified users if they are contained in the creators list
             User userToAnalize;
             while (userIterator.hasNext()) {
                 userToAnalize = userIterator.next();
-                if(request.getUsernames().contains(userToAnalize.getUsername())) {
+                if (usernames.contains(userToAnalize.getUsername())) {
                     activity.getCreators().remove(userToAnalize);
                 }
             }
+            //checks that not every creator has been removed
+            //else re-add this user as the only creator
+            if (activity.getCreators().isEmpty()) {
+                activity.getCreators().add(user);
+            }
             activityRepository.save(activity);
             return "";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null" : {
+                case "the activity id cannot be null": {
                     return "the activity id cannot be null";
                 }
-                case "user not found" : {
+                case "user not found": {
                     return "user not found";
                 }
-                case "you don't have the permission to remove creators from this activity" : {
+                case "you don't have the permission to remove creators from this activity": {
                     return "you don't have the permission to remove creators from this activity";
                 }
-                default: return null;
+                default:
+                    return null;
             }
         }
     }
@@ -352,42 +338,44 @@ public class ActivityService {
             User user = tokenRepository.getUserByToken(request.getToken());
             Preconditions.checkNotNull(user, "user not found");
             Activity activity = activityRepository.findById(request.getActivityId()).get();
-            //check if the user has permissions to add a creator
-            boolean found = false;
-            Iterator<User> userIterator = activity.getAdmins().iterator();
-            while (!found && userIterator.hasNext()) {
-                if(user.equals(userIterator.next())) {
-                    found = true;
-                }
-            }
-            Preconditions.checkArgument(found, "you don't have the permission to add admins to this activity");
-            //check that all usernames exist
+            //check if the user has permissions to add an admin
+            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have the permission to add admins to this activity");
             //the system ignores if the user wants to add an admin that already exists
-            List<User> usersToAdd = userRepository.getAllByUsernamesIfExist(request.getUsernames(), request.getUsernames().size());
+
+            //eliminates duplicate strings from the list of usernames
+            List<String> usernames = request.getUsernames().stream().distinct().toList();
+            //check that every username exists
+            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
+                    "not every specified username exists");
+
+            List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
             for (User u : usersToAdd) {
                 //check if the user is not already a creator
-                if(!activity.getAdmins().contains(u)) {
+                if (!activity.getAdmins().contains(u)) {
                     activity.getAdmins().add(u);
                 }
             }
             activityRepository.save(activity);
             return "";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null" : {
+                case "the activity id cannot be null": {
                     return "the activity id cannot be null";
                 }
-                case "user not found" : {
+                case "user not found": {
                     return "user not found";
                 }
-                case "you don't have the permission to add admins to this activity" : {
+                case "you don't have the permission to add admins to this activity": {
                     return "you don't have the permission to add admins to this activity";
                 }
-                case "the list of usernames is empty" : {
+                case "the list of usernames is empty": {
                     return "the list of usernames is empty";
                 }
-                default: return null;
+                case "not every specified username exists": {
+                    return "not every specified username exists";
+                }
+                default:
+                    return null;
             }
         }
     }
@@ -398,40 +386,137 @@ public class ActivityService {
             User user = tokenRepository.getUserByToken(request.getToken());
             Preconditions.checkNotNull(user, "user not found");
             Activity activity = activityRepository.findById(request.getActivityId()).get();
-            //check if the user has permissions to add a creator
-            boolean found = false;
+            //check if the user has permissions to remove an admin
+            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have the permission to remove admins from this activity");
+
+            //eliminates duplicate strings from the list of usernames
+            List<String> usernames = request.getUsernames().stream().distinct().toList();
+            //check that every username exists
+            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
+                    "not every specified username exists");
+
             Iterator<User> userIterator = activity.getAdmins().iterator();
-            while (!found && userIterator.hasNext()) {
-                if(user.equals(userIterator.next())) {
-                    found = true;
-                }
-            }
-            Preconditions.checkArgument(found, "you don't have the permission to remove admins from this activity");
-            //renew users list
-            userIterator = activity.getAdmins().iterator();
-            //removes all the specified users if they are contained in the creators list
+            //removes all the specified users if they are contained in the admins list
             User userToAnalize;
             while (userIterator.hasNext()) {
                 userToAnalize = userIterator.next();
-                if(request.getUsernames().contains(userToAnalize.getUsername())) {
+                //cannot remove an admin if he is a creator
+                if (usernames.contains(userToAnalize.getUsername()) && !activity.getCreators().contains(userToAnalize)) {
                     activity.getAdmins().remove(userToAnalize);
+                }
+            }
+            //checks that not every admin has been removed
+            //else re-add this user as the only admin
+            if (activity.getAdmins().isEmpty()) {
+                activity.getAdmins().add(user);
+            }
+            activityRepository.save(activity);
+            return "";
+        } catch (Exception e) {
+            switch (e.getMessage()) {
+                case "the activity id cannot be null": {
+                    return "the activity id cannot be null";
+                }
+                case "user not found": {
+                    return "user not found";
+                }
+                case "you don't have the permission to remove admins from this activity": {
+                    return "you don't have the permission to remove admins from this activity";
+                }
+                default:
+                    return null;
+            }
+        }
+    }
+
+    public String addActivityPartecipants(UpdatePermissionsDto request) {
+        try {
+            Preconditions.checkNotNull(request.getActivityId(), "the activity id cannot be null");
+            Preconditions.checkArgument(!request.getUsernames().isEmpty(), "the list of usernames is empty");
+            User user = tokenRepository.getUserByToken(request.getToken());
+            Preconditions.checkNotNull(user, "user not found");
+            Activity activity = activityRepository.findById(request.getActivityId()).get();
+            //check if the user has permissions to add a partecipant
+            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have the permission to add partecipants to this activity");
+
+            //eliminates duplicate strings from the list of usernames
+            List<String> usernames = request.getUsernames().stream().distinct().toList();
+            //check that every username exists
+            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
+                    "not every specified username exists");
+
+            //the system ignores if the user wants to add a partecipant that already exists
+            List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
+            for (User u : usersToAdd) {
+                //check if the user is not already a creator
+                if (!activity.getPartecipants().contains(u)) {
+                    activity.getPartecipants().add(u);
                 }
             }
             activityRepository.save(activity);
             return "";
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             switch (e.getMessage()) {
-                case "the activity id cannot be null" : {
+                case "the activity id cannot be null": {
                     return "the activity id cannot be null";
                 }
-                case "user not found" : {
+                case "user not found": {
                     return "user not found";
                 }
-                case "you don't have the permission to remove admins from this activity" : {
-                    return "you don't have the permission to remove admins from this activity";
+                case "you don't have the permission to add partecipants to this activity": {
+                    return "you don't have the permission to add partecipants to this activity";
                 }
-                default: return null;
+                case "the list of usernames is empty": {
+                    return "the list of usernames is empty";
+                }
+                case "not every specified username exists": {
+                    return "not every specified username exists";
+                }
+                default:
+                    return null;
+            }
+        }
+    }
+
+    public String removeActivityPartecipants(UpdatePermissionsDto request) {
+        try {
+            Preconditions.checkNotNull(request.getActivityId(), "the activity id cannot be null");
+            User user = tokenRepository.getUserByToken(request.getToken());
+            Preconditions.checkNotNull(user, "user not found");
+            Activity activity = activityRepository.findById(request.getActivityId()).get();
+            //check if the user has permissions to remove a partecipant
+            Preconditions.checkArgument(activity.getAdmins().contains(user), "you don't have the permission to remove partecipants from this activity");
+
+            //eliminates duplicate strings from the list of usernames
+            List<String> usernames = request.getUsernames().stream().distinct().toList();
+            //check that every username exists
+            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
+                    "not every specified username exists");
+
+            Iterator<User> userIterator = activity.getPartecipants().iterator();
+            //removes all the specified users if they are contained in the partecipants list
+            User userToAnalize;
+            while (userIterator.hasNext()) {
+                userToAnalize = userIterator.next();
+                if (usernames.contains(userToAnalize.getUsername())) {
+                    activity.getPartecipants().remove(userToAnalize);
+                }
+            }
+            activityRepository.save(activity);
+            return "";
+        } catch (Exception e) {
+            switch (e.getMessage()) {
+                case "the activity id cannot be null": {
+                    return "the activity id cannot be null";
+                }
+                case "user not found": {
+                    return "user not found";
+                }
+                case "you don't have the permission to remove partecipants from this activity": {
+                    return "you don't have the permission to remove partecipants from this activity";
+                }
+                default:
+                    return null;
             }
         }
     }

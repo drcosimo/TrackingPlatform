@@ -171,7 +171,14 @@ public class ActivityControllerImpl implements ActivityController {
     @Override
     public ResponseEntity<String> addActivityPartecipants(UpdatePermissionsDto request) {
         try {
-            return null;
+            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
+                    "preconditions failed");
+            String response = activityService.addActivityPartecipants(request);
+            Preconditions.checkNotNull(response, "response null");
+            return new ResponseEntity(
+                    response,
+                    HttpStatus.OK
+            );
         }
         catch (Exception e) {
             return exceptionReturn(e.getMessage());
@@ -181,7 +188,14 @@ public class ActivityControllerImpl implements ActivityController {
     @Override
     public ResponseEntity<String> removeActivityPartecipants(UpdatePermissionsDto request) {
         try {
-            return null;
+            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
+                    "preconditions failed");
+            String response = activityService.removeActivityPartecipants(request);
+            Preconditions.checkNotNull(response, "response null");
+            return new ResponseEntity(
+                    response,
+                    HttpStatus.OK
+            );
         }
         catch (Exception e) {
             return exceptionReturn(e.getMessage());
