@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins="*")
+//this layer has token control and body nullity check on every method
 public class UserControllerImpl implements UserController {
 
     @Autowired
     private UserService userService;
 
-    //add token control from every method
 
     @Override
     public ResponseEntity<UserDto> register (UserDto userDto) {

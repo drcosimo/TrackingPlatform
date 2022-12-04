@@ -9,7 +9,7 @@ import java.util.List;
 public class Project extends Post {
 
     @OneToMany
-    @JoinColumn(name = "id_post")
+    @JoinColumn(name = "id_project")
     private List<ActivityProject> activities;
 
     public Project() {
