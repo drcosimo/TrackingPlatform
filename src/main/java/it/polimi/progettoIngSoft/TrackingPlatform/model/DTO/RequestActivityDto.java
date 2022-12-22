@@ -3,6 +3,7 @@ package it.polimi.progettoIngSoft.TrackingPlatform.model.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.Instant;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RequestActivityDto {
@@ -16,7 +17,9 @@ public class RequestActivityDto {
 
     private Instant endDate;
 
-    private String projectId;
+    private Long projectId;
+
+    private List<Long> vehiclesIds;
 
     private String token;
 
@@ -55,11 +58,11 @@ public class RequestActivityDto {
         this.endDate = endDate;
     }
 
-    public String getProjectId() {
+    public Long getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(String projectId) {
+    public void setProjectId(Long projectId) {
         this.projectId = projectId;
     }
 
@@ -77,5 +80,13 @@ public class RequestActivityDto {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<Long> getVehiclesIds() {
+        return vehiclesIds;
+    }
+
+    public void setVehiclesIds(List<Long> vehiclesIds) {
+        this.vehiclesIds = vehiclesIds;
     }
 }

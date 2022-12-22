@@ -4,7 +4,9 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Token;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface TokenRepository extends JpaRepository<Token, Long> {
     public Token findByUser(User user);
     public Token findByToken(String token);

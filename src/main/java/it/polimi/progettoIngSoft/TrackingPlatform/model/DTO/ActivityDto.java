@@ -2,8 +2,12 @@ package it.polimi.progettoIngSoft.TrackingPlatform.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Activity;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.vehicle.Vehicle;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ActivityDto {
@@ -19,7 +23,11 @@ public class ActivityDto {
 
     private String projectName;
 
-    private Integer numberOfPosts;
+    private Integer numberOfImages;
+
+    private List<Long> vehiclesIds;
+
+    private String error;
 
     public ActivityDto() {
     }
@@ -32,9 +40,17 @@ public class ActivityDto {
         endDate = activity.getEndDate();
         projectName = activity.getName();
         if(activity.getPostImages() != null){
-            numberOfPosts = activity.getPostImages().size();
+            numberOfImages = activity.getPostImages().size();
         }
-        else numberOfPosts = 0;
+        else numberOfImages = 0;
+        vehiclesIds = new ArrayList<>();
+        for (Vehicle v : activity.getVehicles()) {
+            vehiclesIds.add(v.getId());
+        }
+    }
+
+    public ActivityDto(String error) {
+        this.error = error;
     }
 
     public Long getId() {
@@ -86,10 +102,18 @@ public class ActivityDto {
     }
 
     public Integer getNumberOfPosts() {
-        return numberOfPosts;
+        return numberOfImages;
     }
 
-    public void setNumberOfPosts(Integer numberOfPosts) {
-        this.numberOfPosts = numberOfPosts;
+    public void setNumberOfPosts(Integer numberOfImages) {
+        this.numberOfImages = numberOfImages;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

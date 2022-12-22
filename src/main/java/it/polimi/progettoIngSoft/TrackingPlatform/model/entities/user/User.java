@@ -1,10 +1,8 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user;
 
-import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment.Comment;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.reaction.Reaction;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Token;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Project;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
