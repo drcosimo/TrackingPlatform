@@ -5,7 +5,6 @@ import it.polimi.progettoIngSoft.TrackingPlatform.controller.interfaces.Activity
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ActivityDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.ProjectActivitiesRequest;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.RequestActivityDto;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UpdatePermissionsDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.service.ActivityService;
 import it.polimi.progettoIngSoft.TrackingPlatform.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,108 +99,6 @@ public class ActivityControllerImpl implements ActivityController {
             return exceptionReturn(e.getMessage());
         }
 
-    }
-
-    @Override
-    public ResponseEntity<String> addActivityCreatorPermissions(UpdatePermissionsDto request) {
-        try {
-            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    PRECONDITIONS_FAILED);
-            String response = activityService.addActivityCreatorPermissions(request);
-            Preconditions.checkNotNull(response, RESPONSE_NULL);
-            return new ResponseEntity(
-                    response,
-                    HttpStatus.OK
-            );
-        }
-        catch (Exception e) {
-            return exceptionReturn(e.getMessage());
-        }
-    }
-
-    @Override
-    public ResponseEntity<String> removeActivityCreatorPermissions(UpdatePermissionsDto request) {
-        try {
-            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    PRECONDITIONS_FAILED);
-            String response = activityService.removeActivityCreatorPermissions(request);
-            Preconditions.checkNotNull(response, RESPONSE_NULL);
-            return new ResponseEntity(
-                    response,
-                    HttpStatus.OK
-            );
-        }
-        catch (Exception e) {
-            return exceptionReturn(e.getMessage());
-        }
-    }
-
-    @Override
-    public ResponseEntity<String> addActivityAdminPermissions(UpdatePermissionsDto request) {
-        try {
-            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    PRECONDITIONS_FAILED);
-            String response = activityService.addActivityAdminPermissions(request);
-            Preconditions.checkNotNull(response, RESPONSE_NULL);
-            return new ResponseEntity(
-                    response,
-                    HttpStatus.OK
-            );
-        }
-        catch (Exception e) {
-            return exceptionReturn(e.getMessage());
-        }
-    }
-
-    @Override
-    public ResponseEntity<String> removeActivityAdminPermissions(UpdatePermissionsDto request) {
-        try {
-            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    PRECONDITIONS_FAILED);
-            String response = activityService.removeActivityAdminPermissions(request);
-            Preconditions.checkNotNull(response, RESPONSE_NULL);
-            return new ResponseEntity(
-                    response,
-                    HttpStatus.OK
-            );
-        }
-        catch (Exception e) {
-            return exceptionReturn(e.getMessage());
-        }
-    }
-
-    @Override
-    public ResponseEntity<String> addActivityPartecipants(UpdatePermissionsDto request) {
-        try {
-            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    PRECONDITIONS_FAILED);
-            String response = activityService.addActivityPartecipants(request);
-            Preconditions.checkNotNull(response, RESPONSE_NULL);
-            return new ResponseEntity(
-                    response,
-                    HttpStatus.OK
-            );
-        }
-        catch (Exception e) {
-            return exceptionReturn(e.getMessage());
-        }
-    }
-
-    @Override
-    public ResponseEntity<String> removeActivityPartecipants(UpdatePermissionsDto request) {
-        try {
-            Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
-                    PRECONDITIONS_FAILED);
-            String response = activityService.removeActivityPartecipants(request);
-            Preconditions.checkNotNull(response, RESPONSE_NULL);
-            return new ResponseEntity(
-                    response,
-                    HttpStatus.OK
-            );
-        }
-        catch (Exception e) {
-            return exceptionReturn(e.getMessage());
-        }
     }
 
     private ResponseEntity exceptionReturn(String errorMessage) {
