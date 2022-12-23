@@ -12,4 +12,8 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("select p.activities from Project p where p.id = :idProject")
     public List<ActivityProject> getProjectActivitiesById(Long idProject);
+
+    public Project findFirstByActivitiesContains(ActivityProject activityProject);
+
+
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins="*")
-public class PostControllerImpl implements PostController {
+public class PostControllerImpl implements PostController{
 
     @Autowired
     private TokenService tokenService;
