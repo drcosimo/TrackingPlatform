@@ -80,14 +80,19 @@ public class ProjectControllerImpl implements ProjectController {
             // controllo che la sessione sia valida
             if(tokenService.isUserEnabled(newProject.getToken())){
                 // effettuo la creazione del progetto e restituisco il dto per la visualizzazione
-                return projectService.createProject(newProject);
+                ProjectDto project = projectService.createProject(newProject);
+                if (project != null){
+                    return new ResponseEntity<>(project,HttpStatus.OK);
+                }else{
+                    return exceptionReturn(RESPONSE_NULL);
+                }
             }else{
                 // utente non loggato, operazione illegale
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                return exceptionReturn(PRECONDITIONS_FAILED);
             }
         }catch(Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return exceptionReturn("");
         }
     }
 
@@ -96,13 +101,18 @@ public class ProjectControllerImpl implements ProjectController {
             // autenticazione
             if(tokenService.isUserEnabled(project.getToken())){
                 // effettuo il delete del progetto
-                return projectService.deleteProject(project);
+                String response = projectService.deleteProject(project);
+                if (response != null){
+                    return new ResponseEntity<>(response,HttpStatus.OK);
+                }else{
+                    return exceptionReturn(RESPONSE_NULL);
+                }
             }else{
-                return new ResponseEntity<>("utente non autenticato",HttpStatus.UNAUTHORIZED);
+                return exceptionReturn(PRECONDITIONS_FAILED);
             }
         }catch(Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>("errore inaspettato",HttpStatus.INTERNAL_SERVER_ERROR);
+            return exceptionReturn("");
         }
     }
 

@@ -78,7 +78,7 @@ public class ProjectService {
         }
     }
 
-    public ResponseEntity<ProjectDto> createProject(CreateProjectDto np){
+    public ProjectDto createProject(CreateProjectDto np){
         try{
             // ottengo il riferimento all utente
             User user = tokenRepository.getUserByToken(np.getToken());
@@ -111,15 +111,15 @@ public class ProjectService {
             // salvo il nuovo progetto sul db
             projectRepository.save(project);
             // restituisco il progetto
-            return new ResponseEntity<>(new ProjectDto(project),HttpStatus.OK);
+            return new ProjectDto(project);
 
         }catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return null;
         }
     }
 
-    public ResponseEntity<String> deleteProject(DeleteProjectDto dp){
+    public String deleteProject(DeleteProjectDto dp){
         try {
             // TODO controllo dp.getIdProject is a valid number
             // ottengo il riferimento al progetto
@@ -130,14 +130,13 @@ public class ProjectService {
                 project.setDeleted(true);
                 projectRepository.save(project);
 
-                return new ResponseEntity<>("cancellazione effettuata con successo", HttpStatus.OK);
+                return "cancellazione effettuata con successo";
+            }else {
+                return null;
             }
-
-            return new ResponseEntity<>("progetto non trovato",HttpStatus.BAD_REQUEST);
-
         }catch(Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>("errore inaspettato",HttpStatus.INTERNAL_SERVER_ERROR);
+            return null;
         }
     }
 }
