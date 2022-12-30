@@ -22,6 +22,8 @@ public class ProjectDto {
 
     private Instant endDate;
 
+    private boolean visible;
+
     private List<ActivityDto> activities = new ArrayList<ActivityDto>();
 
     private List<PostImage> images;
@@ -51,6 +53,7 @@ public class ProjectDto {
         this.description = project.getDescription();
         this.beginDate = project.getBeginDate();
         this.endDate = project.getEndDate();
+        this.visible = project.isVisible();
         if (project.getActivities() != null) {
             for (Activity activity : project.getActivities()) {
                 this.activities.add(new ActivityDto(activity));
@@ -151,5 +154,13 @@ public class ProjectDto {
 
     public void setAdmins(List<VisualizeUser> admins) {
         this.admins = admins;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }

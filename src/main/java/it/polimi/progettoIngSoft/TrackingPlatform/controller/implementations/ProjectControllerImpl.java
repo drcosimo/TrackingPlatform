@@ -32,9 +32,9 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<List<ProjectDto>> getProjects(GetProjectsDto u){
         try{
-            // autenticazione
+            // preconditions
             if(tokenService.isUserEnabled(u.getToken()) && u != null){
-                // restituisco i post all'utente
+                // return posts to the user
                 List<ProjectDto> projects = projectService.getProjects(u);
                 if(projects != null){
                     return new ResponseEntity<>(projects,HttpStatus.OK);
@@ -42,12 +42,12 @@ public class ProjectControllerImpl implements ProjectController {
                     return exceptionReturn(RESPONSE_NULL);
                 }
             }else{
-                // utente non loggato, operazione illegale
+                // preconditions failed
                 return exceptionReturn(PRECONDITIONS_FAILED);
             }
         }catch(Exception e){
             e.printStackTrace();
-            // errore interno
+            // unexpected error
             return exceptionReturn("");
         }
     }
@@ -55,18 +55,18 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<ProjectDetails> updateProjectDetails(UpdateProjectDetailsDto p){
         try{
-            // controllo che la sessione sia valida
+            // preconditions
             if(tokenService.isUserEnabled(p.getToken()) && p != null){
-                // restituisco il progetto aggiornato all'utente
+                //return updated project to user
                 ProjectDetails pd = projectService.updateProjectDetails(p);
-
+                // check non nullity
                 if (pd != null){
                     return new ResponseEntity<>(pd,HttpStatus.OK);
                 }else{
                     return exceptionReturn(RESPONSE_NULL);
                 }
             }else{
-                // utente non loggato, operazione illegale
+                // preconditions failed
                 return exceptionReturn(PRECONDITIONS_FAILED);
             }
         }catch (Exception e){
@@ -77,9 +77,9 @@ public class ProjectControllerImpl implements ProjectController {
     @Override
     public ResponseEntity<ProjectDto> createProject(CreateProjectDto newProject){
         try{
-            // controllo che la sessione sia valida
-            if(tokenService.isUserEnabled(newProject.getToken())){
-                // effettuo la creazione del progetto e restituisco il dto per la visualizzazione
+            // preconditions
+            if(tokenService.isUserEnabled(newProject.getToken()) && newProject != null){
+                // create project and return dto for visualization
                 ProjectDto project = projectService.createProject(newProject);
                 if (project != null){
                     return new ResponseEntity<>(project,HttpStatus.OK);
@@ -87,7 +87,7 @@ public class ProjectControllerImpl implements ProjectController {
                     return exceptionReturn(RESPONSE_NULL);
                 }
             }else{
-                // utente non loggato, operazione illegale
+                // preconditions failed
                 return exceptionReturn(PRECONDITIONS_FAILED);
             }
         }catch(Exception e){
@@ -98,10 +98,30 @@ public class ProjectControllerImpl implements ProjectController {
 
     public ResponseEntity<String> deleteProject(DeleteProjectDto project){
         try{
-            // autenticazione
-            if(tokenService.isUserEnabled(project.getToken())){
-                // effettuo il delete del progetto
+            // authentication
+            if(tokenService.isUserEnabled(project.getToken()) && project != null){
+                // delete of the project
                 String response = projectService.deleteProject(project);
+                if (response != null){
+                    return new ResponseEntity<>(response,HttpStatus.OK);
+                }else{
+                    return exceptionReturn(RESPONSE_NULL);
+                }
+            }else{
+                return exceptionReturn(PRECONDITIONS_FAILED);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return exceptionReturn("");
+        }
+    }
+
+    public ResponseEntity<String> changeVisibility(ChangeVisibilityDto v){
+        try{
+            // authentication
+            if(tokenService.isUserEnabled(v.getToken()) && v != null){
+                // change visibility
+                String response = projectService.changeVisibility(v);
                 if (response != null){
                     return new ResponseEntity<>(response,HttpStatus.OK);
                 }else{

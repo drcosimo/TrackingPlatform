@@ -16,5 +16,5 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Project getProjectById(Long idProject);
 
-    List<Project> getProjectByCreators(User user);
+    public List<Project> getProjectByCreators(User user);
 }

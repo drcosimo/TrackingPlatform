@@ -30,22 +30,24 @@ public class ProjectService {
     @Autowired
     TokenRepository tokenRepository;
 
-    // classe per la gestione dei controlli ed eccezioni
     public List<ProjectDto> getProjects(GetProjectsDto u){
         try {
-            // ottengo il riferimento all'utente passando per il token
+            // get the reference of the user through the token
             Token token = tokenRepository.findByToken(u.getToken());
             User user = token.getUser();
 
             if (user != null) {
-                // ottengo tutti i progetti associati all'utente
+                // get all projects of the user
                 List<Project> projects = projectRepository.getProjectByCreators(user);
                 List<ProjectDto> projectDtoList = new ArrayList<ProjectDto>();
-                // conversione project in projectDto
+                // convert project in Dto
                 for (Project project : projects) {
-                    projectDtoList.add(new ProjectDto(project));
+                    // exclude deleted projects
+                    if (!project.isDeleted()) {
+                        projectDtoList.add(new ProjectDto(project));
+                    }
                 }
-                // restituisco la lista di post
+                // return posts' list
                 return projectDtoList;
             }else{
                 return null;
@@ -58,18 +60,19 @@ public class ProjectService {
 
     public ProjectDetails updateProjectDetails(UpdateProjectDetailsDto p){
         try {
-            // ottengo il progetto a cui fa riferimento il DTO
+            // get the project by id
             Project project = projectRepository.getProjectById(p.getIdProject());
 
-            // associo i dati modificati
-            project.setName(p.getName());
-            project.setDescription(p.getDescription());
-            project.setBeginDate(p.getBeginDate());
-            project.setEndDate(p.getEndDate());
+            // modify requested data
+            // if data is not passed the relative field is left unmodified
+            if (p.getName() != null) project.setName(p.getName());
+            if(p.getDescription() != null) project.setDescription(p.getDescription());
+            if(p.getBeginDate() != null ) project.setBeginDate(p.getBeginDate());
+            if(p.getEndDate() != null) project.setEndDate(p.getEndDate());
 
-            // eseguo l'update
+            // execute update
             project = projectRepository.save(project);
-            // update effettuato, restituisco il progetto aggiornato
+            // return updated project
             ProjectDetails pd = new ProjectDetails(project);
             return pd;
         }catch (Exception e){
@@ -80,23 +83,23 @@ public class ProjectService {
 
     public ProjectDto createProject(CreateProjectDto np){
         try{
-            // ottengo il riferimento all utente
+            // get the user reference
             User user = tokenRepository.getUserByToken(np.getToken());
 
-            // controllo utente valido
+            // check valid user
             if (user == null){
                 return null;
             }
 
-            // ottengo i riferimenti agli utenti coinvolti nel progetto
+            // get the references of the users associated with the project
             List<User> creators = new ArrayList<User>();
             List<User> admins = new ArrayList<User>();
             List<User> partecipants = new ArrayList<User>();
 
-            // aggiungo l utente che sta creando il progetto
+            // add the user creator
             creators.add(user);
             admins.add(user);
-            // creo il progetto
+            // create project
             Project project = new Project();
             project.setName(np.getName());
             project.setDescription(np.getDescription());
@@ -108,9 +111,9 @@ public class ProjectService {
             project.setCreators(creators);
             project.setAdmins(admins);
 
-            // salvo il nuovo progetto sul db
+            // save the new project
             projectRepository.save(project);
-            // restituisco il progetto
+            // return project dto
             return new ProjectDto(project);
 
         }catch (Exception e){
@@ -122,18 +125,38 @@ public class ProjectService {
     public String deleteProject(DeleteProjectDto dp){
         try {
             // TODO controllo dp.getIdProject is a valid number
-            // ottengo il riferimento al progetto
+            // get the project's reference
             Project project = projectRepository.getProjectById(dp.getIdProject());
 
             if (project != null) {
-                // effettuo il delete del progetto
+                // virtual delete of the project
                 project.setDeleted(true);
                 projectRepository.save(project);
 
-                return "cancellazione effettuata con successo";
+                return "delete successfull";
             }else {
                 return null;
             }
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String changeVisibility(ChangeVisibilityDto v){
+        try{
+            // get the project reference
+            Project project = projectRepository.getProjectById(v.getIdProject());
+            if(project != null){
+                // set the visibility of the project
+                project.setVisible(v.isVisibility());
+                // save the updated project
+                if(projectRepository.save(project) != null){
+                    return "project's visibility successfully changed";
+                }
+            }
+            // error in updating
+            return null;
         }catch(Exception e){
             e.printStackTrace();
             return null;

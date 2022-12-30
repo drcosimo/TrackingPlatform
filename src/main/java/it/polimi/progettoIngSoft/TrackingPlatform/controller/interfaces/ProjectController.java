@@ -16,15 +16,18 @@ import java.util.List;
 @CrossOrigin(origins="*",allowedHeaders = "*",exposedHeaders = "*")
 public interface ProjectController {
 
-    @PostMapping(path="/getProjects")
+    @PostMapping(path="/project/getProjects")
     public ResponseEntity<List<ProjectDto>> getProjects(@RequestBody GetProjectsDto u);
 
-    @PostMapping(path="/updateProjectDetails")
+    @PostMapping(path="/project/updateProjectDetails")
     public ResponseEntity<ProjectDetails> updateProjectDetails(@RequestBody UpdateProjectDetailsDto p);
 
-    @PostMapping(path="/createProject")
+    @PostMapping(path="/project/createProject")
     public ResponseEntity<ProjectDto> createProject(@RequestBody CreateProjectDto newProject);
 
-    @DeleteMapping(path="/deleteProject")
+    @DeleteMapping(path="/project/deleteProject")
     public ResponseEntity<String> deleteProject(@RequestBody DeleteProjectDto project);
+
+    @PostMapping(path="/project/changeVisibility")
+    public ResponseEntity<String> changeVisibility(@RequestBody ChangeVisibilityDto project);
 }

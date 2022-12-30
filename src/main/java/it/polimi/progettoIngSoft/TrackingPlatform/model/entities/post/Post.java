@@ -195,10 +195,11 @@ public abstract class Post {
         this.comments = comments;
     }
 
-    public void setDeleted(boolean b) {
-        this.deleted = b;
+    public boolean isDeleted() {
+        return deleted;
     }
-    public boolean getDeleted(){
-        return this.deleted;
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
