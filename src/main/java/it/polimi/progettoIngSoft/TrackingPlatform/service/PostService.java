@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -67,22 +69,29 @@ public class PostService {
     //the system ignores if the user wants to add a creator that already exists
     public String addCreator(UpdatePermissionsDto request) {
         try {
+            //request params check
             Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
+            //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
             Preconditions.checkNotNull(user, USER_NOT_FOUND);
+            Preconditions.checkNotNull(user.getId(), USER_NOT_FOUND);
+            //retrieving the Post
             Post post = postRepository.findById(request.getPostId()).get();
+            //fetching creators
             post.setCreators(postRepository.getCreatorsById(post.getId()));
+            //checking permissions
             Preconditions.checkArgument(post.getCreators().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_CREATORS_TO_THIS_ + POST);
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
                     NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
+            //retrieving users instances to add
             List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
             post.setAdmins(postRepository.getAdminsById(post.getId()));
+            //add every user to its new permissions
             for (User u : usersToAdd) {
-                //check if the user is not already a creator
                 if (!post.getCreators().contains(u)) {
                     post.getCreators().add(u);
                 }
@@ -116,6 +125,158 @@ public class PostService {
                 }
                 projectRepository.save(project);
             }
+            postRepository.save(post);
+            return "";
+        } catch (Exception e) {
+            switch (e.getMessage()) {
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
+                }
+                case THE_POST_ID_CANNOT_BE_NULL : {
+                    return THE_POST_ID_CANNOT_BE_NULL;
+                }
+                case THE_LIST_OF_USERNAMES_IS_EMPTY : {
+                    return THE_LIST_OF_USERNAMES_IS_EMPTY;
+                }
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_CREATORS_TO_THIS_ + POST : {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_CREATORS_TO_THIS_ + POST;
+                }
+                case NOT_EVERY_SPECIFIED_USERNAME_EXISTS : {
+                    return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
+                }
+                default:
+                    return null;
+            }
+        }
+    }
+
+    public String removeCreator(UpdatePermissionsDto request) {
+        try {
+            //request params check
+            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
+            //check that the user exists
+            User user = tokenRepository.getUserByToken(request.getToken());
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
+            Preconditions.checkNotNull(user.getId(), USER_NOT_FOUND);
+            //retrieving the Post
+            Post post = postRepository.findById(request.getPostId()).get();
+            //fetching creators
+            post.setCreators(postRepository.getCreatorsById(post.getId()));
+            //checking permissions
+            Preconditions.checkArgument(post.getCreators().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST);
+            //eliminates duplicate strings from the list of usernames
+            List<String> usernames = request.getUsernames().stream().distinct().toList();
+            //check that every username exists
+            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
+                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
+            //retrieving users instances to remove
+            List<User> usersToRemove = userRepository.findByUsernameIn(usernames);
+            //fetching post admins
+            post.setAdmins(postRepository.getAdminsById(post.getId()));
+
+            //removes from usersToRemove all users having the permission of admin in the project
+            //because ad admin of the project cannot be deleted from any under-ActivityProject permissions
+            if (post instanceof ActivityProject) {
+               Project proj = projectRepository.findFirstByActivitiesContains((ActivityProject) post);
+               proj.setAdmins(postRepository.getAdminsById(proj.getId()));
+               for (User u : usersToRemove) {
+                   if (proj.getAdmins().contains(u)) {
+                       usersToRemove.remove(u);
+                   }
+               }
+            }
+
+            //eliminates the permission for the selected users
+            for (User u : usersToRemove) {
+                post.getCreators().remove(u);
+            }
+            //checks that not every creator has been removed
+            //else re-add this user as the only creator
+            if (post.getCreators().isEmpty()) {
+                post.getCreators().add(user);
+            }
+
+            postRepository.save(post);
+            return "";
+        } catch (Exception e) {
+            switch (e.getMessage()) {
+                case THE_POST_ID_CANNOT_BE_NULL : {
+                    return THE_POST_ID_CANNOT_BE_NULL;
+                }
+                case THE_LIST_OF_USERNAMES_IS_EMPTY : {
+                    return THE_LIST_OF_USERNAMES_IS_EMPTY;
+                }
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST;
+                }
+                case USER_NOT_FOUND: {
+                    return USER_NOT_FOUND;
+                }
+                case NOT_EVERY_SPECIFIED_USERNAME_EXISTS : {
+                    return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
+                }
+                default:
+                    return null;
+            }
+        }
+    }
+
+    public String addAdmin(UpdatePermissionsDto request) {
+        try {
+            //request params check
+            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
+            //check that the user exists
+            User user = tokenRepository.getUserByToken(request.getToken());
+            Preconditions.checkNotNull(user, USER_NOT_FOUND);
+            Preconditions.checkNotNull(user.getId(), USER_NOT_FOUND);
+            //retrieving the Post
+            Post post = postRepository.findById(request.getPostId()).get();
+            //fetching admins
+            post.setAdmins(postRepository.getAdminsById(post.getId()));
+            //checking permissions
+            Preconditions.checkArgument(post.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_CREATORS_TO_THIS_ + POST);
+            //eliminates duplicate strings from the list of usernames
+            List<String> usernames = request.getUsernames().stream().distinct().toList();
+            //check that every username exists
+            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
+                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
+            //retrieving users instances to add
+            List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
+            //add every user to its new permissions
+            for (User u : usersToAdd) {
+                if (!post.getAdmins().contains(u)) {
+                    post.getAdmins().add(u);
+                }
+            }
+
+            //if the post is a project, it is necessary to add new users in projectAdmins list and in every permission list of every ActivityProject contained in the project
+            if (post instanceof Project) {
+                Project project = (Project) post;
+                //fetching the activities
+                project.setActivities(projectRepository.getProjectActivitiesById(post.getId()));
+                int counter = 0;
+                //fetching creators and admins of the activities
+                for (ActivityProject act : project.getActivities()) {
+                    project.getActivities().get(counter).setCreators(postRepository.getCreatorsById(act.getId()));
+                    project.getActivities().get(counter).setAdmins(postRepository.getAdminsById(act.getId()));
+                }
+                //for every ActivityProject in the project, add every user to creators' and admins' list
+                for (int j = 0 ; j < project.getActivities().size() ; j++) {
+                    for (User u : usersToAdd) {
+                        if (!project.getActivities().get(j).getCreators().contains(u)) {
+                            project.getActivities().get(j).getCreators().add(u);
+                        }
+                        if (!project.getActivities().get(j).getAdmins().contains(u)) {
+                            project.getActivities().get(j).getAdmins().add(u);
+                        }
+                    }
+                    activityRepository.save(project.getActivities().get(j));
+                }
+                projectRepository.save(project);
+            }
+            postRepository.save(post);
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
@@ -141,8 +302,12 @@ public class PostService {
     }
 
     //TODO we have to do another method that eliminates user's permissions from the Project and all it's activities (new feature)
-    public String removeCreator(UpdatePermissionsDto request) {
+
+    //TODO what happend if a project admin is removed?? what about all its activities permissions?
+    //TODO we could leave those permissions or leave only the admin permissions of the activities
+    public String removeAdmin(UpdatePermissionsDto request) {
         try {
+            //request params check
             Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             //check that the user exists
@@ -151,142 +316,60 @@ public class PostService {
             Preconditions.checkNotNull(user.getId(), USER_NOT_FOUND);
             //retrieving the Post
             Post post = postRepository.findById(request.getPostId()).get();
-            //fetching creators
-            post.setCreators(postRepository.getCreatorsById(post.getId()));
+            //fetching admins
+            post.setAdmins(postRepository.getAdminsById(post.getId()));
             //checking permissions
-            Preconditions.checkArgument(post.getCreators().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST);
+            Preconditions.checkArgument(post.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST);
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
                     NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
+            //retrieving users instances to remove
             List<User> usersToRemove = userRepository.findByUsernameIn(usernames);
+            //fetching post admins
             post.setAdmins(postRepository.getAdminsById(post.getId()));
-            //eliminates all permissions for the selected user
-            for (User u : usersToRemove) {
-                if (post.getCreators().contains(u) && post.getAdmins().contains(u)) {
-                    post.getCreators().remove(u); //TODO QUESTO POTREBBE NON FUNZIONARE IN QUANTO VIENE MODIFICATA LA LISTA PRESA DA Lì MA NON SO SE VIENE CAMBIATA EFFETTIVAMENTE  AL SALVATAGGIO
-                    post.getAdmins().remove(u);
+
+            //removes from usersToRemove all users having the permission of admin in the project
+            //because ad admin of the project cannot be deleted from any under-ActivityProject permissions
+            if (post instanceof ActivityProject) {
+                Project proj = projectRepository.findFirstByActivitiesContains((ActivityProject) post);
+                proj.setAdmins(postRepository.getAdminsById(proj.getId()));
+                for (User u : usersToRemove) {
+                    if (proj.getAdmins().contains(u)) {
+                        usersToRemove.remove(u);
+                    }
                 }
+            }
+
+            //eliminates the permission for the selected users
+            for (User u : usersToRemove) {
+                post.getCreators().remove(u);
             }
             //checks that not every creator has been removed
             //else re-add this user as the only creator
             if (post.getCreators().isEmpty()) {
-                post.getCreators().add(user); //TODO SAME THING of r.167
+                post.getCreators().add(user);
             }
-
-            //TODO che succede se si vuole eliminare un user U da un attività A ma allo stesso tempo A è admin del progetto?
 
             postRepository.save(post);
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
-                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
+                case THE_POST_ID_CANNOT_BE_NULL : {
+                    return THE_POST_ID_CANNOT_BE_NULL;
                 }
-                case USER_NOT_FOUND: {
-                    return USER_NOT_FOUND;
-                }
-                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ACTIVITY: {
-                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ACTIVITY;
-                }
-                default:
-                    return null;
-            }
-        }
-    }
-
-    public String addAdmin(UpdatePermissionsDto request) {
-        try {
-            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
-            Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
-            User user = tokenRepository.getUserByToken(request.getToken());
-            Preconditions.checkNotNull(user, USER_NOT_FOUND);
-            Activity activity = activityRepository.findById(request.getActivityId()).get();
-            //check if the user has permissions to add an admin
-            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_ADMINS_TO_THIS_ACTIVITY);
-            //the system ignores if the user wants to add an admin that already exists
-
-            //eliminates duplicate strings from the list of usernames
-            List<String> usernames = request.getUsernames().stream().distinct().toList();
-            //check that every username exists
-            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
-                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
-
-            List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
-            for (User u : usersToAdd) {
-                //check if the user is not already a creator
-                if (!activity.getAdmins().contains(u)) {
-                    activity.getAdmins().add(u);
-                }
-            }
-            activityRepository.save(activity);
-            return "";
-        } catch (Exception e) {
-            switch (e.getMessage()) {
-                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
-                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
-                }
-                case USER_NOT_FOUND: {
-                    return USER_NOT_FOUND;
-                }
-                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_ADMINS_TO_THIS_ACTIVITY: {
-                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_ADMINS_TO_THIS_ACTIVITY;
-                }
-                case THE_LIST_OF_USERNAMES_IS_EMPTY: {
+                case THE_LIST_OF_USERNAMES_IS_EMPTY : {
                     return THE_LIST_OF_USERNAMES_IS_EMPTY;
                 }
-                case NOT_EVERY_SPECIFIED_USERNAME_EXISTS: {
-                    return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
-                }
-                default:
-                    return null;
-            }
-        }
-    }
-
-    public String removeAdmin(UpdatePermissionsDto request) {
-        try {
-            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
-            User user = tokenRepository.getUserByToken(request.getToken());
-            Preconditions.checkNotNull(user, USER_NOT_FOUND);
-            Activity activity = activityRepository.findById(request.getActivityId()).get();
-            //check if the user has permissions to remove an admin
-            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_ADMINS_FROM_THIS_ACTIVITY);
-
-            //eliminates duplicate strings from the list of usernames
-            List<String> usernames = request.getUsernames().stream().distinct().toList();
-            //check that every username exists
-            Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
-                    NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
-
-            Iterator<User> userIterator = activity.getAdmins().iterator();
-            //removes all the specified users if they are contained in the admins list
-            User userToAnalize;
-            while (userIterator.hasNext()) {
-                userToAnalize = userIterator.next();
-                //cannot remove an admin if he is a creator
-                if (usernames.contains(userToAnalize.getUsername()) && !activity.getCreators().contains(userToAnalize)) {
-                    activity.getAdmins().remove(userToAnalize);
-                }
-            }
-            //checks that not every admin has been removed
-            //else re-add this user as the only admin
-            if (activity.getAdmins().isEmpty()) {
-                activity.getAdmins().add(user);
-            }
-            activityRepository.save(activity);
-            return "";
-        } catch (Exception e) {
-            switch (e.getMessage()) {
-                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
-                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST;
                 }
                 case USER_NOT_FOUND: {
                     return USER_NOT_FOUND;
                 }
-                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_ADMINS_FROM_THIS_ACTIVITY: {
-                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_ADMINS_FROM_THIS_ACTIVITY;
+                case NOT_EVERY_SPECIFIED_USERNAME_EXISTS : {
+                    return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
                 }
                 default:
                     return null;
@@ -385,4 +468,6 @@ public class PostService {
             }
         }
     }
+
+
 }

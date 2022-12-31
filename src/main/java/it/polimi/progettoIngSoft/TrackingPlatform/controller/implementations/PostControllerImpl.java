@@ -24,7 +24,19 @@ public class PostControllerImpl implements PostController{
     @Autowired
     private PostService postService;
 
-    @Override
+    private ResponseEntity exceptionReturn(String errorMessage) {
+        switch (errorMessage) {
+            case PRECONDITIONS_FAILED : {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            case RESPONSE_NULL : {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            default: return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
     public ResponseEntity<String> addCreator(UpdatePermissionsDto request) {
         try {
             Preconditions.checkArgument(request != null && tokenService.isUserEnabled(request.getToken()),
@@ -40,7 +52,7 @@ public class PostControllerImpl implements PostController{
             return exceptionReturn(e.getMessage());
         }
     }
-
+/*
     @Override
     public ResponseEntity<String> removeCreator(UpdatePermissionsDto request) {
         try {
@@ -126,15 +138,6 @@ public class PostControllerImpl implements PostController{
         }
     }
 
-    private ResponseEntity exceptionReturn(String errorMessage) {
-        switch (errorMessage) {
-            case PRECONDITIONS_FAILED : {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-            case RESPONSE_NULL : {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            default: return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
+
+ */
 }
