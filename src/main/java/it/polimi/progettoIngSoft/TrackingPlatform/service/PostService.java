@@ -94,6 +94,7 @@ public class PostService {
             //if the post is a project, it is necessary to add new users in projectAdmins list and in every permission list of every ActivityProject contained in the project
             if (post instanceof Project) {
                 Project project = (Project) post;
+                //fetching the activities
                 project.setActivities(projectRepository.getProjectActivitiesById(post.getId()));
                 int counter = 0;
                 //fetching creators and admins of the activities
@@ -101,7 +102,7 @@ public class PostService {
                     project.getActivities().get(counter).setCreators(postRepository.getCreatorsById(act.getId()));
                     project.getActivities().get(counter).setAdmins(postRepository.getAdminsById(act.getId()));
                 }
-                //for every ActivityProject in the project, add every user to creators and admins list
+                //for every ActivityProject in the project, add every user to creators' and admins' list
                 for (int j = 0 ; j < project.getActivities().size() ; j++) {
                     for (User u : usersToAdd) {
                         if (!project.getActivities().get(j).getCreators().contains(u)) {
@@ -139,35 +140,44 @@ public class PostService {
         }
     }
 
+    //TODO we have to do another method that eliminates user's permissions from the Project and all it's activities (new feature)
     public String removeCreator(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
+            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
+            //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
             Preconditions.checkNotNull(user, USER_NOT_FOUND);
-            Activity activity = activityRepository.findById(request.getActivityId()).get();
-            //check if the user has permissions to add a creator
-            Preconditions.checkArgument(activity.getCreators().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ACTIVITY);
-
+            Preconditions.checkNotNull(user.getId(), USER_NOT_FOUND);
+            //retrieving the Post
+            Post post = postRepository.findById(request.getPostId()).get();
+            //fetching creators
+            post.setCreators(postRepository.getCreatorsById(post.getId()));
+            //checking permissions
+            Preconditions.checkArgument(post.getCreators().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST);
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
                     NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
-            Iterator<User> userIterator = activity.getCreators().iterator();
-            //removes all the specified users if they are contained in the creators list
-            User userToAnalize;
-            while (userIterator.hasNext()) {
-                userToAnalize = userIterator.next();
-                if (usernames.contains(userToAnalize.getUsername())) {
-                    activity.getCreators().remove(userToAnalize);
+            List<User> usersToRemove = userRepository.findByUsernameIn(usernames);
+            post.setAdmins(postRepository.getAdminsById(post.getId()));
+            //eliminates all permissions for the selected user
+            for (User u : usersToRemove) {
+                if (post.getCreators().contains(u) && post.getAdmins().contains(u)) {
+                    post.getCreators().remove(u); //TODO QUESTO POTREBBE NON FUNZIONARE IN QUANTO VIENE MODIFICATA LA LISTA PRESA DA Lì MA NON SO SE VIENE CAMBIATA EFFETTIVAMENTE  AL SALVATAGGIO
+                    post.getAdmins().remove(u);
                 }
             }
             //checks that not every creator has been removed
             //else re-add this user as the only creator
-            if (activity.getCreators().isEmpty()) {
-                activity.getCreators().add(user);
+            if (post.getCreators().isEmpty()) {
+                post.getCreators().add(user); //TODO SAME THING of r.167
             }
-            activityRepository.save(activity);
+
+            //TODO che succede se si vuole eliminare un user U da un attività A ma allo stesso tempo A è admin del progetto?
+
+            postRepository.save(post);
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
