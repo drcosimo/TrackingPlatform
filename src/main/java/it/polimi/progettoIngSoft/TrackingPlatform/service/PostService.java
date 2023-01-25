@@ -3,11 +3,11 @@ package it.polimi.progettoIngSoft.TrackingPlatform.service;
 import com.google.common.base.Preconditions;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UpdatePermissionsDto;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Activity;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.ActivityPost;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.ActivityProject;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Project;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
+import it.polimi.progettoIngSoft.TrackingPlatform.repository.ActivityProjectRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.ActivityRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.PostRepository;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.ProjectRepository;
@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,6 +38,9 @@ public class PostService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private ActivityProjectRepository activityProjectRepository;
 
 
     private final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_ = "user does not have permission to ";
@@ -261,6 +262,7 @@ public class PostService {
                 for (ActivityProject act : project.getActivities()) {
                     project.getActivities().get(counter).setCreators(postRepository.getCreatorsById(act.getId()));
                     project.getActivities().get(counter).setAdmins(postRepository.getAdminsById(act.getId()));
+                    counter++;
                 }
                 //for every ActivityProject in the project, add every user to creators' and admins' list
                 for (int j = 0 ; j < project.getActivities().size() ; j++) {
@@ -301,10 +303,19 @@ public class PostService {
         }
     }
 
+
+
+    //TODO PROBLEM: what happend if a project admin is removed?? what about all its activities permissions?
+
+    //TODO i did this:
+    // we decided that we have to add a registry that remembers the activities that a user created
+    // and when he is removed from project admin permission, he still has all permissions on the created ActivityProject
+
     //TODO we have to do another method that eliminates user's permissions from the Project and all it's activities (new feature)
 
-    //TODO what happend if a project admin is removed?? what about all its activities permissions?
     //TODO we could leave those permissions or leave only the admin permissions of the activities
+
+
     public String removeAdmin(UpdatePermissionsDto request) {
         try {
             //request params check
@@ -327,7 +338,7 @@ public class PostService {
                     NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
             //retrieving users instances to remove
             List<User> usersToRemove = userRepository.findByUsernameIn(usernames);
-            //fetching post admins
+            //fetching post's admins
             post.setAdmins(postRepository.getAdminsById(post.getId()));
 
             //removes from usersToRemove all users having the permission of admin in the project
@@ -344,12 +355,32 @@ public class PostService {
 
             //eliminates the permission for the selected users
             for (User u : usersToRemove) {
-                post.getCreators().remove(u);
+                post.getAdmins().remove(u);
             }
-            //checks that not every creator has been removed
-            //else re-add this user as the only creator
-            if (post.getCreators().isEmpty()) {
-                post.getCreators().add(user);
+
+            //for every ActivityProject in the project, add every user to creators' and admins' list
+            if (post instanceof Project) {
+                Project project = (Project) post;
+                //fetching ActivityProject
+                project.setActivities(projectRepository.getProjectActivitiesById(post.getId()));
+                int counter = 0;
+                //fetching creators and admins of every ActivityProject
+                for (ActivityProject act : project.getActivities()) {
+                    project.getActivities().get(counter).setCreators(postRepository.getCreatorsById(act.getId()));
+                    project.getActivities().get(counter).setAdmins(postRepository.getAdminsById(act.getId()));
+                    project.getActivities().get(counter).setCreator(activityProjectRepository.getRealCreatorById(act.getId()));
+                    counter++;
+                }
+                for (int j = 0 ; j < project.getActivities().size() ; j++) {
+                    for (User u : usersToRemove) {
+                        //removes every user's permission from the activity only if he is not the real creator of it
+                        if (!project.getActivities().get(j).getCreator().equals(u)) {
+                            project.getActivities().get(j).getCreators().remove(u);
+                            project.getActivities().get(j).getAdmins().remove(u);
+                        }
+                    }
+                    activityRepository.save(project.getActivities().get(j));
+                }
             }
 
             postRepository.save(post);
@@ -377,6 +408,7 @@ public class PostService {
         }
     }
 
+    //TODO fai da qua in poi
     public String addPartecipant(UpdatePermissionsDto request) {
         try {
             Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);

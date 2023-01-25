@@ -4,11 +4,25 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.vehicle.Vehicle;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import java.time.Instant;
 import java.util.List;
 
 @Entity
 public class ActivityProject extends Activity{
+
+    @OneToOne
+    @JoinColumn(name = "id_user")
+    private User creator;
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
 
     public ActivityProject() {
     }
