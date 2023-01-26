@@ -59,6 +59,7 @@ public abstract class Post {
     )
     private List<User> admins;
 
+    //project's partecipants are every under-activity partecipant + extra
     @ManyToMany
     @JoinTable(
             name = "posts_partecipants",

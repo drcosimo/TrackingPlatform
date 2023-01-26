@@ -5,14 +5,14 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.vehicle.Vehicle
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import java.time.Instant;
 import java.util.List;
 
 @Entity
 public class ActivityProject extends Activity{
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_user")
     private User creator;
 

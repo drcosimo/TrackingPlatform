@@ -67,7 +67,7 @@ public abstract class User {
     public boolean equals (Object obj){
         try {
             User toCompare = (User) obj;
-            if((this == toCompare) || (this.token == toCompare.getToken()) ||
+            if((this == toCompare) || (this.id.equals(toCompare.getId())) ||
             (this.email.equals(toCompare.getEmail())) && this.password.equals(toCompare.getPassword())) {
                 return true;
             }

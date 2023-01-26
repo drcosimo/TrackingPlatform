@@ -314,6 +314,7 @@ public class PostService {
     //TODO we have to do another method that eliminates user's permissions from the Project and all it's activities (new feature)
 
     //TODO we could leave those permissions or leave only the admin permissions of the activities
+    // and eventually leave its creator permissions on its created ActivityProject
 
 
     public String removeAdmin(UpdatePermissionsDto request) {
@@ -408,46 +409,52 @@ public class PostService {
         }
     }
 
-    //TODO fai da qua in poi
+
     public String addPartecipant(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
+            //request params check
+            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
+            //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
             Preconditions.checkNotNull(user, USER_NOT_FOUND);
-            Activity activity = activityRepository.findById(request.getActivityId()).get();
-            //check if the user has permissions to add a partecipant
-            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ACTIVITY);
-
+            Preconditions.checkNotNull(user.getId(), USER_NOT_FOUND);
+            //retrieving the Post
+            Post post = postRepository.findById(request.getPostId()).get();
+            //fetching admins
+            post.setAdmins(postRepository.getAdminsById(post.getId()));
+            //checking permissions
+            Preconditions.checkArgument(post.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ + POST);
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
                     NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
-
             //the system ignores if the user wants to add a partecipant that already exists
             List<User> usersToAdd = userRepository.findByUsernameIn(usernames);
+            //fetching partecipants
+            post.setPartecipants(postRepository.getPartecipantsById(post.getId()));
             for (User u : usersToAdd) {
-                //check if the user is not already a creator
-                if (!activity.getPartecipants().contains(u)) {
-                    activity.getPartecipants().add(u);
+                //check if the user is not already a partecipant
+                if (!post.getPartecipants().contains(u)) {
+                    post.getPartecipants().add(u);
                 }
             }
-            activityRepository.save(activity);
+            postRepository.save(post);
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
-                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
+                case THE_POST_ID_CANNOT_BE_NULL: {
+                    return THE_POST_ID_CANNOT_BE_NULL;
+                }
+                case THE_LIST_OF_USERNAMES_IS_EMPTY: {
+                    return THE_LIST_OF_USERNAMES_IS_EMPTY;
                 }
                 case USER_NOT_FOUND: {
                     return USER_NOT_FOUND;
                 }
-                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ACTIVITY: {
-                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ACTIVITY;
-                }
-                case THE_LIST_OF_USERNAMES_IS_EMPTY: {
-                    return THE_LIST_OF_USERNAMES_IS_EMPTY;
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ + POST: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_PARTECIPANTS_TO_THIS_ + POST;
                 }
                 case NOT_EVERY_SPECIFIED_USERNAME_EXISTS: {
                     return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
@@ -458,42 +465,52 @@ public class PostService {
         }
     }
 
+    //TODO a new feature could be to remove a partecipant from the whole project and every under-activity
     public String removePartecipant(UpdatePermissionsDto request) {
         try {
-            Preconditions.checkNotNull(request.getActivityId(), THE_ACTIVITY_ID_CANNOT_BE_NULL);
+            //request params check
+            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
+            //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
             Preconditions.checkNotNull(user, USER_NOT_FOUND);
-            Activity activity = activityRepository.findById(request.getActivityId()).get();
-            //check if the user has permissions to remove a partecipant
-            Preconditions.checkArgument(activity.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ACTIVITY);
-
+            Preconditions.checkNotNull(user.getId(), USER_NOT_FOUND);
+            //retrieving the Post
+            Post post = postRepository.findById(request.getPostId()).get();
+            //fetching admins
+            post.setAdmins(postRepository.getAdminsById(post.getId()));
+            //checking permissions
+            Preconditions.checkArgument(post.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ + POST);
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
             Preconditions.checkArgument(userRepository.countByUsernames(usernames).equals(Integer.valueOf(usernames.size())),
                     NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
-
-            Iterator<User> userIterator = activity.getPartecipants().iterator();
-            //removes all the specified users if they are contained in the partecipants list
-            User userToAnalize;
-            while (userIterator.hasNext()) {
-                userToAnalize = userIterator.next();
-                if (usernames.contains(userToAnalize.getUsername())) {
-                    activity.getPartecipants().remove(userToAnalize);
-                }
+            List<User> usersToRemove = userRepository.findByUsernameIn(usernames);
+            //fetching partecipants
+            post.setPartecipants(postRepository.getPartecipantsById(post.getId()));
+            for (User u : usersToRemove) {
+                post.getPartecipants().remove(u);
             }
-            activityRepository.save(activity);
+            postRepository.save(post);
             return "";
+
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case THE_ACTIVITY_ID_CANNOT_BE_NULL: {
-                    return THE_ACTIVITY_ID_CANNOT_BE_NULL;
+                case THE_POST_ID_CANNOT_BE_NULL: {
+                    return THE_POST_ID_CANNOT_BE_NULL;
+                }
+                case THE_LIST_OF_USERNAMES_IS_EMPTY: {
+                    return THE_LIST_OF_USERNAMES_IS_EMPTY;
                 }
                 case USER_NOT_FOUND: {
                     return USER_NOT_FOUND;
                 }
-                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ACTIVITY: {
-                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ACTIVITY;
+                case USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ + POST: {
+                    return USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_PARTECIPANTS_FROM_THIS_ + POST;
+                }
+                case NOT_EVERY_SPECIFIED_USERNAME_EXISTS: {
+                    return NOT_EVERY_SPECIFIED_USERNAME_EXISTS;
                 }
                 default:
                     return null;
