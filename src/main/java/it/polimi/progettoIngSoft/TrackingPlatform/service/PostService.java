@@ -474,9 +474,7 @@ public class PostService {
             List<User> usersToRemove = userRepository.findByUsernameIn(usernames);
             //fetching partecipants
             post.setPartecipants(postRepository.getPartecipantsById(post.getId()));
-            for (User u : usersToRemove) {
-                post.getPartecipants().remove(u);
-            }
+            post.getPartecipants().removeIf(p -> usersToRemove.contains(p));
             postRepository.save(post);
             return "";
 
