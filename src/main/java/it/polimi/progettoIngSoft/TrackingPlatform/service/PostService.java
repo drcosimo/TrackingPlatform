@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -42,11 +43,8 @@ public class PostService {
 
 
     private final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_ = "user does not have permission to ";
-    private final String ACTIVITY = "activity";
-    private final String PROJECT = "project";
     private final String POST = "post";
     private final String USER_NOT_FOUND = "user not found";
-    private final String THE_POST_ID_CANNOT_BE_NULL = "the post id cannot be null";
     private final String THE_LIST_OF_USERNAMES_IS_EMPTY = "the list of usernames is empty";
     private final String ADD_CREATORS_TO_THIS_ = "add creators to this ";
     private final String NOT_EVERY_SPECIFIED_USERNAME_EXISTS = "not every specified username exists";
@@ -69,7 +67,7 @@ public class PostService {
     public String addCreator(UpdatePermissionsDto request) {
         try {
             //request params check
-            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkNotNull(request.getPostId(), POST_NOT_FOUND);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
@@ -131,8 +129,8 @@ public class PostService {
                 case USER_NOT_FOUND: {
                     return USER_NOT_FOUND;
                 }
-                case THE_POST_ID_CANNOT_BE_NULL : {
-                    return THE_POST_ID_CANNOT_BE_NULL;
+                case POST_NOT_FOUND : {
+                    return POST_NOT_FOUND;
                 }
                 case THE_LIST_OF_USERNAMES_IS_EMPTY : {
                     return THE_LIST_OF_USERNAMES_IS_EMPTY;
@@ -152,7 +150,7 @@ public class PostService {
     public String removeCreator(UpdatePermissionsDto request) {
         try {
             //request params check
-            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkNotNull(request.getPostId(), POST_NOT_FOUND);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
@@ -175,21 +173,16 @@ public class PostService {
             post.setAdmins(postRepository.getAdminsById(post.getId()));
 
             //removes from usersToRemove all users having the permission of admin in the project
-            //because ad admin of the project cannot be deleted from any under-ActivityProject permissions
+            //because ad admin of the project cannot be deleted from any under-ActivityProject
             if (post instanceof ActivityProject) {
                Project proj = projectRepository.findFirstByActivitiesContains((ActivityProject) post);
                proj.setAdmins(postRepository.getAdminsById(proj.getId()));
-               for (User u : usersToRemove) {
-                   if (proj.getAdmins().contains(u)) {
-                       usersToRemove.remove(u);
-                   }
-               }
+               usersToRemove.removeIf(u -> proj.getAdmins().contains(u));
             }
 
             //eliminates the permission for the selected users
-            for (User u : usersToRemove) {
-                post.getCreators().remove(u);
-            }
+            post.getCreators().removeAll(usersToRemove);
+
             //checks that not every creator has been removed
             //else re-add this user as the only creator
             if (post.getCreators().isEmpty()) {
@@ -200,8 +193,8 @@ public class PostService {
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case THE_POST_ID_CANNOT_BE_NULL : {
-                    return THE_POST_ID_CANNOT_BE_NULL;
+                case POST_NOT_FOUND : {
+                    return POST_NOT_FOUND;
                 }
                 case THE_LIST_OF_USERNAMES_IS_EMPTY : {
                     return THE_LIST_OF_USERNAMES_IS_EMPTY;
@@ -224,7 +217,7 @@ public class PostService {
     public String addAdmin(UpdatePermissionsDto request) {
         try {
             //request params check
-            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkNotNull(request.getPostId(), POST_NOT_FOUND);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
@@ -235,7 +228,7 @@ public class PostService {
             //fetching admins
             post.setAdmins(postRepository.getAdminsById(post.getId()));
             //checking permissions
-            Preconditions.checkArgument(post.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_CREATORS_TO_THIS_ + POST);
+            Preconditions.checkArgument(post.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + ADD_ADMINS_TO_THIS_ + POST);
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
@@ -283,8 +276,8 @@ public class PostService {
                 case USER_NOT_FOUND: {
                     return USER_NOT_FOUND;
                 }
-                case THE_POST_ID_CANNOT_BE_NULL : {
-                    return THE_POST_ID_CANNOT_BE_NULL;
+                case POST_NOT_FOUND : {
+                    return POST_NOT_FOUND;
                 }
                 case THE_LIST_OF_USERNAMES_IS_EMPTY : {
                     return THE_LIST_OF_USERNAMES_IS_EMPTY;
@@ -318,7 +311,7 @@ public class PostService {
     public String removeAdmin(UpdatePermissionsDto request) {
         try {
             //request params check
-            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkNotNull(request.getPostId(), POST_NOT_FOUND);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
@@ -329,7 +322,7 @@ public class PostService {
             //fetching admins
             post.setAdmins(postRepository.getAdminsById(post.getId()));
             //checking permissions
-            Preconditions.checkArgument(post.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_CREATORS_FROM_THIS_ + POST);
+            Preconditions.checkArgument(post.getAdmins().contains(user), USER_DOES_NOT_HAVE_PERMISSIONS_TO_ + REMOVE_ADMINS_FROM_THIS_ + POST);
             //eliminates duplicate strings from the list of usernames
             List<String> usernames = request.getUsernames().stream().distinct().toList();
             //check that every username exists
@@ -337,25 +330,19 @@ public class PostService {
                     NOT_EVERY_SPECIFIED_USERNAME_EXISTS);
             //retrieving users instances to remove
             List<User> usersToRemove = userRepository.findByUsernameIn(usernames);
-            //fetching post's admins
-            post.setAdmins(postRepository.getAdminsById(post.getId()));
 
             //removes from usersToRemove all users having the permission of admin in the project
             //because ad admin of the project cannot be deleted from any under-ActivityProject permissions
             if (post instanceof ActivityProject) {
                 Project proj = projectRepository.findFirstByActivitiesContains((ActivityProject) post);
                 proj.setAdmins(postRepository.getAdminsById(proj.getId()));
-                for (User u : usersToRemove) {
-                    if (proj.getAdmins().contains(u)) {
-                        usersToRemove.remove(u);
-                    }
-                }
+                usersToRemove.removeIf(u -> proj.getAdmins().contains(u));
             }
 
-            //eliminates the permission for the selected users
-            for (User u : usersToRemove) {
-                post.getAdmins().remove(u);
-            }
+            //removes from usersToRemove all creators of the post
+            post.setCreators(postRepository.getCreatorsById(post.getId()));
+            usersToRemove.removeIf(u -> post.getCreators().contains(u));
+
 
             //for every ActivityProject in the project, add every user to creators' and admins' list
             if (post instanceof Project) {
@@ -371,23 +358,23 @@ public class PostService {
                     counter++;
                 }
                 for (int j = 0 ; j < project.getActivities().size() ; j++) {
-                    for (User u : usersToRemove) {
-                        //removes every user's permission from the activity only if he is not the real creator of it
-                        if (!project.getActivities().get(j).getCreator().equals(u)) {
-                            project.getActivities().get(j).getCreators().remove(u);
-                            project.getActivities().get(j).getAdmins().remove(u);
-                        }
-                    }
-                    activityRepository.save(project.getActivities().get(j));
+                    //removes every user's permission from the activity only if he is not the real creator of it
+                    final User realCreator = project.getActivities().get(j).getCreator();
+                    project.getActivities().get(j).getCreators().removeIf(creator -> !creator.equals(realCreator) && usersToRemove.contains(creator));
+                    project.getActivities().get(j).getAdmins().removeIf(creator -> !creator.equals(realCreator) && usersToRemove.contains(creator));
                 }
+                activityRepository.saveAll(project.getActivities());
             }
+
+            //eliminates the permission for the selected users
+            post.getAdmins().removeAll(usersToRemove);
 
             postRepository.save(post);
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case THE_POST_ID_CANNOT_BE_NULL : {
-                    return THE_POST_ID_CANNOT_BE_NULL;
+                case POST_NOT_FOUND : {
+                    return POST_NOT_FOUND;
                 }
                 case THE_LIST_OF_USERNAMES_IS_EMPTY : {
                     return THE_LIST_OF_USERNAMES_IS_EMPTY;
@@ -411,7 +398,7 @@ public class PostService {
     public String addPartecipant(UpdatePermissionsDto request) {
         try {
             //request params check
-            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkNotNull(request.getPostId(), POST_NOT_FOUND);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
@@ -442,8 +429,8 @@ public class PostService {
             return "";
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case THE_POST_ID_CANNOT_BE_NULL: {
-                    return THE_POST_ID_CANNOT_BE_NULL;
+                case POST_NOT_FOUND: {
+                    return POST_NOT_FOUND;
                 }
                 case THE_LIST_OF_USERNAMES_IS_EMPTY: {
                     return THE_LIST_OF_USERNAMES_IS_EMPTY;
@@ -467,7 +454,7 @@ public class PostService {
     public String removePartecipant(UpdatePermissionsDto request) {
         try {
             //request params check
-            Preconditions.checkNotNull(request.getPostId(), THE_POST_ID_CANNOT_BE_NULL);
+            Preconditions.checkNotNull(request.getPostId(), POST_NOT_FOUND);
             Preconditions.checkArgument(!request.getUsernames().isEmpty(), THE_LIST_OF_USERNAMES_IS_EMPTY);
             //check that the user exists
             User user = tokenRepository.getUserByToken(request.getToken());
@@ -495,8 +482,8 @@ public class PostService {
 
         } catch (Exception e) {
             switch (e.getMessage()) {
-                case THE_POST_ID_CANNOT_BE_NULL: {
-                    return THE_POST_ID_CANNOT_BE_NULL;
+                case POST_NOT_FOUND: {
+                    return POST_NOT_FOUND;
                 }
                 case THE_LIST_OF_USERNAMES_IS_EMPTY: {
                     return THE_LIST_OF_USERNAMES_IS_EMPTY;
