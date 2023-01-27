@@ -394,7 +394,7 @@ public class PostService {
         }
     }
 
-
+    //TODO for now no controls on add/remove partecipants
     public String addPartecipant(UpdatePermissionsDto request) {
         try {
             //request params check
