@@ -13,7 +13,7 @@ import java.util.List;
 public class ActivityProject extends Activity{
 
     @ManyToOne
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "id_creator", nullable = false)
     private User creator;
 
     public User getCreator() {

@@ -2,7 +2,6 @@ package it.polimi.progettoIngSoft.TrackingPlatform.service;
 
 import com.google.common.base.Preconditions;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.UpdatePermissionsDto;
-import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Activity;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.ActivityProject;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Project;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
 import java.util.List;
 
 @Service

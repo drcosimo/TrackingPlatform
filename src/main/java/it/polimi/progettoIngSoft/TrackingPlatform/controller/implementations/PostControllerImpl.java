@@ -52,7 +52,7 @@ public class PostControllerImpl implements PostController{
             return exceptionReturn(e.getMessage());
         }
     }
-/*
+
     @Override
     public ResponseEntity<String> removeCreator(UpdatePermissionsDto request) {
         try {
@@ -138,6 +138,4 @@ public class PostControllerImpl implements PostController{
         }
     }
 
-
- */
 }

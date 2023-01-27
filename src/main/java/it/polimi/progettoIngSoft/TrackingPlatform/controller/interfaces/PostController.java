@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface PostController {
     @PostMapping("/addCreator")
     public ResponseEntity<String> addCreator(@RequestBody UpdatePermissionsDto request);
-/*
+
     @PostMapping("/removeCreator")
     public ResponseEntity<String> removeCreator(@RequestBody UpdatePermissionsDto request);
 
@@ -27,6 +27,4 @@ public interface PostController {
     @PostMapping("/removePartecipant")
     public ResponseEntity<String> removePartecipant(@RequestBody UpdatePermissionsDto request);
 
-
- */
 }
