@@ -1,5 +1,6 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user;
 
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Message;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.reaction.Reaction;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Token;
@@ -11,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.sql.Date;
 import java.util.List;
@@ -60,6 +62,12 @@ public abstract class User {
 
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private Token token;
+
+    @OneToMany(mappedBy = "sender", fetch = FetchType.EAGER)
+    private List<Message> sentMessages;
+
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER)
+    private List<Message> receivedMessages;
 
     public abstract boolean isAdmin();
 
@@ -148,6 +156,22 @@ public abstract class User {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public List<Message> getSentMessages() {
+        return sentMessages;
+    }
+
+    public void setSentMessages(List<Message> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public List<Message> getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    public void setReceivedMessages(List<Message> receivedMessages) {
+        this.receivedMessages = receivedMessages;
     }
 
     public List<Post> getCreatedPosts() {
