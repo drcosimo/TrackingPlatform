@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -63,10 +64,12 @@ public abstract class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private Token token;
 
-    @OneToMany(mappedBy = "sender", fetch = FetchType.EAGER)
+    @OneToMany
+    @JoinColumn(name = "id_sender")
     private List<Message> sentMessages;
 
-    @OneToMany(mappedBy = "receiver", fetch = FetchType.EAGER)
+    @OneToMany
+    @JoinColumn(name = "id_receiver")
     private List<Message> receivedMessages;
 
     public abstract boolean isAdmin();

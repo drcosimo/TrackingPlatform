@@ -37,7 +37,7 @@ public class Comment {
     private boolean visible = true;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_comment_reply")
+    @JoinColumn(name = "id_comment")
     private List<CommentReply> replies = null;
 
     @PrePersist

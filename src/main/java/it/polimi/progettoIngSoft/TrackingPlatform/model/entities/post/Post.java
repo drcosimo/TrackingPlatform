@@ -67,11 +67,11 @@ public abstract class Post {
     private List<User> partecipants;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_image")
+    @JoinColumn(name = "id_post")
     private List<PostImage> postImages;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_track")
+    @JoinColumn(name = "id_post")
     private List<Track> tracks;
 
     @ManyToMany
@@ -83,7 +83,7 @@ public abstract class Post {
     private List<Reaction> reactions;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_comment")
+    @JoinColumn(name = "id_post")
     private List<Comment> comments;
 
     public Post() {
