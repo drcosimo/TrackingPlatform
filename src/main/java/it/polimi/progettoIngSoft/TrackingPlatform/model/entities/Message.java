@@ -1,7 +1,10 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.entities;
 
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
+
 import javax.persistence.*;
 import java.sql.Date;
+import java.time.Instant;
 
 @Entity
 public class Message {
@@ -15,7 +18,31 @@ public class Message {
     private String message;
 
     @Column(nullable = false)
-    private Date timestamp;
+    private Instant timestamp;
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
+    @ManyToOne
+    @JoinColumn(name="id_receiver")
+    private User receiver;
+
+    @ManyToOne
+    @JoinColumn(name="id_sender")
+    private User sender;
 
     public Message() {
     }
@@ -36,11 +63,12 @@ public class Message {
         this.message = message;
     }
 
-    public Date getTimestamp() {
+
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 }

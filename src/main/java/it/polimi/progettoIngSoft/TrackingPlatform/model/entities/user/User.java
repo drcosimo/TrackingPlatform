@@ -64,12 +64,10 @@ public abstract class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private Token token;
 
-    @OneToMany
-    @JoinColumn(name = "id_sender")
+    @OneToMany(mappedBy = "sender")
     private List<Message> sentMessages;
 
-    @OneToMany
-    @JoinColumn(name = "id_receiver")
+    @OneToMany(mappedBy = "receiver")
     private List<Message> receivedMessages;
 
     public abstract boolean isAdmin();
