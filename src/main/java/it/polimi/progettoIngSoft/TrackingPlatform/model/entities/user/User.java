@@ -1,20 +1,13 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Message;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment.Comment;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment.CommentReply;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.reaction.Reaction;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Token;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.sql.Date;
 import java.util.List;
 
@@ -69,6 +62,13 @@ public abstract class User {
 
     @OneToMany(mappedBy = "receiver")
     private List<Message> receivedMessages;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_user")
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "commentReplyCreator")
+    private List<CommentReply> commentReplies;
 
     public abstract boolean isAdmin();
 

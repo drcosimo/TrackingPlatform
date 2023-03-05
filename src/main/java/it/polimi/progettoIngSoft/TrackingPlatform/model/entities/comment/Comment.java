@@ -1,5 +1,6 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment;
 
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 
 import javax.persistence.CascadeType;
@@ -28,6 +29,10 @@ public class Comment {
     //use to order comments in a post in a chronological way
     @Column(nullable = false)
     private Instant creationTime;
+
+    @ManyToOne
+    @JoinColumn(name = "id_post")
+    private Post post;
 
     @ManyToOne
     @JoinColumn(name = "id_user")
