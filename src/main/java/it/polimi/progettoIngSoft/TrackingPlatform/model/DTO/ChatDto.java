@@ -2,34 +2,22 @@ package it.polimi.progettoIngSoft.TrackingPlatform.model.DTO;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.Message;
 
-import java.util.List;
-import java.util.Map;
 
 public class ChatDto {
-    private String username;
-    private Message lastMessage;
+    private MessageDto lastMessage;
 
     public ChatDto() {
     }
 
-    public ChatDto(String username, Message lastMessage) {
-        this.username = username;
-        this.lastMessage = lastMessage;
+    public ChatDto(Message lastMessage) {
+        this.lastMessage = new MessageDto(lastMessage);
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Message getLastMessage() {
+    public MessageDto getLastMessage() {
         return lastMessage;
     }
 
-    public void setLastMessage(Message lastMessage) {
+    public void setLastMessage(MessageDto lastMessage) {
         this.lastMessage = lastMessage;
     }
 }
