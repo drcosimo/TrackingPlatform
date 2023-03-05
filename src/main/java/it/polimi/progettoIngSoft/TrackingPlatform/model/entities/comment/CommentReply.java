@@ -21,7 +21,12 @@ public class CommentReply {
 
     @ManyToOne
     @JoinColumn(name = "id_user")
-    private User user;
+    private User commentReplyCreator;
+
+    @ManyToOne
+    @JoinColumn(name ="id_comment")
+    private Comment comment;
+
 
     @Column(nullable = false)
     private String text;
@@ -49,11 +54,11 @@ public class CommentReply {
     }
 
     public User getUser() {
-        return user;
+        return commentReplyCreator;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(User commentReplyCreator) {
+        this.commentReplyCreator = commentReplyCreator;
     }
 
     public String getText() {

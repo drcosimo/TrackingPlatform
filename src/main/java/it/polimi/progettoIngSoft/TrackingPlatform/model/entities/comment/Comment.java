@@ -41,8 +41,7 @@ public class Comment {
     @Column(nullable = false)
     private boolean visible = true;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_comment")
+    @OneToMany(mappedBy = "comment")
     private List<CommentReply> replies = null;
 
     @PrePersist
