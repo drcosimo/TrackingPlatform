@@ -1,5 +1,7 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.DTO;
 
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment.CommentReply;
+
 import java.time.Instant;
 
 public class CommentReplyDto {
@@ -10,7 +12,13 @@ public class CommentReplyDto {
 
     private String usernameCreator;
 
-    public CommentReplyDto() {
+    private Long usernameId;
+
+    public CommentReplyDto(CommentReply commentReply) {
+        content = commentReply.getText();
+        timestamp = commentReply.getCreationTime();
+        usernameCreator = commentReply.getCommentReplyCreator().getUsername();
+        usernameId = commentReply.getCommentReplyCreator().getId();
     }
 
     public String getContent() {

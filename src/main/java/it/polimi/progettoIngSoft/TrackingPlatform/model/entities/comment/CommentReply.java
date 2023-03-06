@@ -84,4 +84,20 @@ public class CommentReply {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
+
+    public User getCommentReplyCreator() {
+        return commentReplyCreator;
+    }
+
+    public void setCommentReplyCreator(User commentReplyCreator) {
+        this.commentReplyCreator = commentReplyCreator;
+    }
+
+    public Comment getComment() {
+        return comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
+    }
 }

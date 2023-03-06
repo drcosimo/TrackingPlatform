@@ -99,4 +99,12 @@ public class Comment {
     public void setReplies(List<CommentReply> replies) {
         this.replies = replies;
     }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
 }
