@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
-    @Query("select c from Comment c where c.post.id = :idPost order by c.creationTime desc")
+    @Query("select c from Comment c where c.post.id = :idPost and c.deleted=false and c.visible=true order by c.creationTime desc")
     public List<Comment> getCommentsByPostId(Long idPost);
 
 }

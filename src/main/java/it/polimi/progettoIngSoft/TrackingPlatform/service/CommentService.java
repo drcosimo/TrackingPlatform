@@ -1,14 +1,12 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.service;
 
 import com.google.common.base.Preconditions;
-import com.vaadin.flow.component.html.Pre;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.DTO.*;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment.Comment;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment.CommentReply;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
 import it.polimi.progettoIngSoft.TrackingPlatform.repository.*;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -79,10 +76,13 @@ public class CommentService {
             // check that the request of deleting comes from the creator of the comment
             Preconditions.checkArgument(comment.getCommentCreator().equals(creator), "only comment owner can delete");
 
-            // delete the comment
-            commentRepository.delete(comment);
+            // virtual delete of comment
+            comment.setDeleted(true);
 
-            return new CommentDto(comment);
+            // delete the comment
+            Comment returnComment = commentRepository.save(comment);
+
+            return new CommentDto(returnComment);
         }catch (Exception e){
             return null;
         }
@@ -152,10 +152,50 @@ public class CommentService {
     }
 
     public CommentReplyDto removeCommentReply(RemoveCommentReplyDto removeComment) {
-        return null;
+        try{
+            // get user from token
+            User replyCreator = tokenRepository.getUserByToken(removeComment.getToken());
+            // get commentReply by id
+            CommentReply commentReply = commentReplyRepository.findById(removeComment.getId_comment_reply()).get();
+
+            // check references not null
+            Preconditions.checkArgument(commentReply != null && replyCreator != null && commentReply.getCommentReplyCreator().equals(replyCreator), "only th creator can delete reply");
+
+            // virtual delete
+            commentReply.setDeleted(true);
+
+            // commit changes
+            CommentReply returnReply = commentReplyRepository.save(commentReply);
+
+            return new CommentReplyDto(returnReply);
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<CommentReplyDto> getCommentReplies(GetCommentRepliesDto getReplies){
-        return null;
+        try{
+            // get comment reference
+            Comment comment = commentRepository.findById(getReplies.getId_comment()).get();
+
+            // check reference not null
+            Preconditions.checkArgument(comment != null, "base comment non existent");
+
+            // get all replies
+            List<CommentReply> replies = commentReplyRepository.getRepliesFromCommentId(comment.getId());
+
+            Preconditions.checkArgument(replies != null, "error executing query");
+            // create list of dto
+            List<CommentReplyDto> repliesDto = new ArrayList<>();
+            for (CommentReply reply : replies){
+                repliesDto.add(new CommentReplyDto(reply));
+            }
+
+            return repliesDto;
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 }

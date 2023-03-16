@@ -2,6 +2,7 @@ package it.polimi.progettoIngSoft.TrackingPlatform.model.entities.comment;
 
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.user.User;
+import org.apache.commons.io.filefilter.FalseFileFilter;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -40,6 +41,17 @@ public class Comment {
 
     @Column(nullable = false)
     private boolean visible = true;
+
+    @Column(nullable=false)
+    private boolean deleted = false;
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
     @OneToMany(mappedBy = "comment")
     private List<CommentReply> replies = null;

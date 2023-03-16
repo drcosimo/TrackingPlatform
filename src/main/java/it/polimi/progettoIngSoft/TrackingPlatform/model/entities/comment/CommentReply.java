@@ -37,6 +37,9 @@ public class CommentReply {
     @Column(nullable = false)
     private boolean visible = true;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     @PrePersist
     private void preSave() {
         creationTime = Instant.now();
@@ -83,6 +86,14 @@ public class CommentReply {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public User getCommentReplyCreator() {

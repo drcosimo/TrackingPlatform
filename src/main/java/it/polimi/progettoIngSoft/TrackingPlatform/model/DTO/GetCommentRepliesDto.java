@@ -4,7 +4,7 @@ public class GetCommentRepliesDto {
 
     private String token;
 
-    private String id_comment;
+    private Long id_comment;
 
     public GetCommentRepliesDto() {
     }
@@ -17,11 +17,11 @@ public class GetCommentRepliesDto {
         this.token = token;
     }
 
-    public String getId_comment() {
+    public Long getId_comment() {
         return id_comment;
     }
 
-    public void setId_comment(String id_comment) {
+    public void setId_comment(Long id_comment) {
         this.id_comment = id_comment;
     }
 }
