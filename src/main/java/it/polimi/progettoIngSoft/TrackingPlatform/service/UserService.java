@@ -189,4 +189,26 @@ public class UserService {
             return Boolean.FALSE;
         }
     }
+
+    public Boolean checkUsernameUnique(String newUsername) {
+        try {
+            User u = userRepository.findByUsername(newUsername);
+            return u == null || StringUtils.isEmpty(u.getUsername());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return Boolean.TRUE;
+        }
+    }
+
+    public Boolean checkEmailUnique(String newEmail) {
+        try {
+            User u = userRepository.findByEmail(newEmail);
+            return u == null || StringUtils.isEmpty(u.getEmail());
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return Boolean.TRUE;
+        }
+    }
 }

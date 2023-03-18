@@ -53,6 +53,28 @@ public class UserControllerImpl implements UserController {
     }
 
     @Override
+    public ResponseEntity<Boolean> checkUsernameUnique(String newUsername) {
+        if(StringUtils.isNotEmpty(newUsername)) {
+            return new ResponseEntity<>(
+                    userService.checkUsernameUnique(newUsername),
+                    HttpStatus.OK
+            );
+        }
+        else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> checkEmailUnique(String newEmail) {
+        if(StringUtils.isNotEmpty(newEmail)) {
+            return new ResponseEntity<>(
+                    userService.checkEmailUnique(newEmail),
+                    HttpStatus.OK
+            );
+        }
+        else return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+    }
+
+    @Override
     public ResponseEntity<UserDto> updateUserDetails (UserDto userUpdate) {
         if(userUpdate != null){
              UserDto updateduser = userService.updateUserDetails(userUpdate);

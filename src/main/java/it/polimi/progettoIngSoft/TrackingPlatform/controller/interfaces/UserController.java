@@ -21,6 +21,12 @@ public interface UserController {
     @PostMapping(path = "/login", produces="application/json" , consumes="application/json")
     public ResponseEntity<UserDto> login (@RequestBody LoginDto credentials);
 
+    @PostMapping(path = "/uniqueUsername", produces = "application/json" , consumes="application/json")
+    public ResponseEntity<Boolean> checkUsernameUnique (@RequestBody String newUsername);
+
+    @PostMapping(path = "/uniqueEmail", produces = "application/json" , consumes="application/json")
+    public ResponseEntity<Boolean> checkEmailUnique (@RequestBody String newEmail);
+
     @PostMapping(path = "/updateUserDetails", produces="application/json" , consumes="application/json")
     public ResponseEntity<UserDto> updateUserDetails (@RequestBody UserDto userUpdate);
 
