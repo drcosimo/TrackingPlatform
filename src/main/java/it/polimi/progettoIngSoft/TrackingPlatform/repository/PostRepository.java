@@ -19,7 +19,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p.partecipants from Post p where p.id = :idPost")
     public List<User> getPartecipantsById (Long idPost);
 
-    @Query("select p from Post p where p.id=:idPost")
+    @Query("select p from Post p where p.id = :idPost")
     public Post getPostById(Long idPost);
 
 }

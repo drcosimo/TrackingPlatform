@@ -40,7 +40,7 @@ public class CommentService {
             User commentCreator = tokenRepository.getUserByToken(addComment.getToken());
 
             // get post from id
-            Post post = postRepository.getPostById(addComment.getId_post());
+            Post post = postRepository.findById(addComment.getId_post()).get();
             Preconditions.checkArgument(commentCreator != null && post != null,"riferimenti inesistenti");
 
             // creation of new comment
@@ -92,7 +92,7 @@ public class CommentService {
     public List<CommentDto> getComments(GetCommentsDto getComments){
         try{
             // get post from id
-            Post post = postRepository.getPostById(getComments.getPostId());
+            Post post = postRepository.findById(getComments.getPostId()).get();
 
             // check post reference
             Preconditions.checkArgument(post != null,"null references");
