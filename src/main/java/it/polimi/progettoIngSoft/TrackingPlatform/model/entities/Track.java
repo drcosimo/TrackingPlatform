@@ -1,23 +1,24 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import org.locationtech.jts.geom.LineString;
+
+import javax.persistence.*;
+import java.sql.Time;
+import java.util.List;
 
 @Entity
-public abstract class Track {
+public class Track {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_track")
     private Long id;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(nullable = false)
+    private LineString track;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @OneToMany(mappedBy = "track")
+    private List<Place> places;
+
+
 }
