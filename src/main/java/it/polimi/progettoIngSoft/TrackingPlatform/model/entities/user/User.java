@@ -47,7 +47,7 @@ public abstract class User {
     private String sex;
 
     @Column(nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive = false;
 
     @ManyToMany(mappedBy = "creators")
     private List<Post> createdPosts = null;

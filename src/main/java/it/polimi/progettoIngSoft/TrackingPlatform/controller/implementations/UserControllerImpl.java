@@ -143,4 +143,38 @@ public class UserControllerImpl implements UserController {
             );
         }
     }
+
+    @Override
+    public ResponseEntity<String> activateAccount(String activationToken) {
+        if(StringUtils.isNotEmpty(activationToken)) {
+            String response = userService.activateAccount(activationToken);
+            if(StringUtils.isNotBlank(response)){
+                return new ResponseEntity<>(
+                        response,
+                        HttpStatus.OK
+                );
+            }
+        }
+        return new ResponseEntity<>(
+                "bad request",
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @Override
+    public ResponseEntity<String> confirmChangeEmail(String changeToken) {
+        if(StringUtils.isNotEmpty(changeToken)) {
+            String response = userService.confirmChangeEmail(changeToken);
+            if(StringUtils.isNotBlank(response)){
+                return new ResponseEntity<>(
+                        response,
+                        HttpStatus.OK
+                );
+            }
+        }
+        return new ResponseEntity<>(
+                "bad request",
+                HttpStatus.BAD_REQUEST
+        );
+    }
 }

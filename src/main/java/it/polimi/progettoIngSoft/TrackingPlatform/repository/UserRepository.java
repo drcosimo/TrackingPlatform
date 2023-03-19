@@ -12,11 +12,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     public User getByEmailAndPassword(String email, String password);
 
-    public User findByEmail(String email);
+    public User findFirstByEmail(String email);
 
     public List<User> findByUsernameIn(List<String> usernames);
 
-    public User findByUsername(String username);
+    public User findFirstByUsername(String username);
 
     @Query("select count(u.id) from User u where u.username in :usernames")
     public Integer countByUsernames(List<String> usernames);

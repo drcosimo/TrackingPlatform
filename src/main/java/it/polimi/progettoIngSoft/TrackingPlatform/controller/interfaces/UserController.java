@@ -21,10 +21,10 @@ public interface UserController {
     @PostMapping(path = "/login", produces="application/json" , consumes="application/json")
     public ResponseEntity<UserDto> login (@RequestBody LoginDto credentials);
 
-    @PostMapping(path = "/uniqueUsername", produces = "application/json" , consumes="application/json")
+    @PostMapping(path = "/uniqueUsername", produces = "application/json")
     public ResponseEntity<Boolean> checkUsernameUnique (@RequestBody String newUsername);
 
-    @PostMapping(path = "/uniqueEmail", produces = "application/json" , consumes="application/json")
+    @PostMapping(path = "/uniqueEmail", produces = "application/json")
     public ResponseEntity<Boolean> checkEmailUnique (@RequestBody String newEmail);
 
     @PostMapping(path = "/updateUserDetails", produces="application/json" , consumes="application/json")
@@ -38,4 +38,10 @@ public interface UserController {
 
     @GetMapping(path = "/unsubscribe/{userToken}", produces="application/json")
     public ResponseEntity<Boolean> unsubscribe (@PathVariable("userToken") String userToken);
+
+    @GetMapping(path = "/activateAccount/{activationToken}", produces = "application/json")
+    public ResponseEntity<String> activateAccount(@PathVariable("activationToken") String activationToken);
+
+    @GetMapping(path = "/confirmChangeEmail/{changeToken}", produces = "application/json")
+    public ResponseEntity<String> confirmChangeEmail(@PathVariable("changeToken") String changeToken);
 }
