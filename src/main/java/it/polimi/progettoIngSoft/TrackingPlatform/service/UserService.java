@@ -43,7 +43,13 @@ public class UserService {
     @Autowired
     private  TokenService tokenService;
 
-    public UserDto register(UserDto userDto) {
+//    @Autowired
+//    private Config config;
+//
+//    @Value("${spring.mail.username}")
+//    private String senderEmail;
+
+    public String register(UserDto userDto) {
         //check guest register fields not null or invalid
         if (StringUtils.isNoneEmpty(userDto.getEmail(), userDto.getPassword(), userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getSex())
                 && userDto.getBirthDate().toLocalDate().isBefore(LocalDate.now().minus(14, ChronoUnit.YEARS)) &&
@@ -53,10 +59,13 @@ public class UserService {
                 User user = userRepository.save(
                         new Guest(userDto.getName(), userDto.getSurname(), userDto.getUsername(), userDto.getEmail(), userDto.getPassword(), userDto.getBirthDate(), userDto.getSex())
                 );
-                LoginDto loginDto = new LoginDto();
-                loginDto.setEmail(user.getEmail());
-                loginDto.setPassword(user.getPassword());
-                return login(loginDto);
+//                SimpleMailMessage message = new SimpleMailMessage();
+//                message.setFrom(senderEmail);
+//                message.setTo(user.getEmail());
+//                message.setSubject("Confirm Registration");
+//                message.setText("please follow this link to confirm your registration to Tracking Platform");
+//                config.getJavaMailSender().send(message);
+                return "ok";
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -91,9 +100,7 @@ public class UserService {
                     error += "sex length not valid \n";
                 }
             }
-            UserDto userError = new UserDto();
-            userError.setError(error);
-            return userError;
+            return error;
         }
     }
 

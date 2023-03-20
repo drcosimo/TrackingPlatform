@@ -23,13 +23,13 @@ public class UserControllerImpl implements UserController {
 
 
     @Override
-    public ResponseEntity<UserDto> register (UserDto userDto) {
+    public ResponseEntity<String> register (UserDto userDto) {
         //nullity parameter check
         if(userDto != null){
-            UserDto returnDto = userService.register(userDto);
-            if(returnDto != null) {
+            String returnObj = userService.register(userDto);
+            if(returnObj != null) {
                 return new ResponseEntity<>(
-                        returnDto,
+                        returnObj,
                         HttpStatus.OK);
             }
             else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

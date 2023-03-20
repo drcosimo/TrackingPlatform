@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface UserController {
 
     @PostMapping(path = "/register", produces="application/json" , consumes="application/json")
-    public ResponseEntity<UserDto> register (@RequestBody UserDto userDto);
+    public ResponseEntity<String> register (@RequestBody UserDto userDto);
 
     @PostMapping(path = "/login", produces="application/json" , consumes="application/json")
     public ResponseEntity<UserDto> login (@RequestBody LoginDto credentials);
