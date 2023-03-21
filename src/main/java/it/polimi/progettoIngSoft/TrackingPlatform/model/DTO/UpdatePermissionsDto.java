@@ -9,9 +9,7 @@ public class UpdatePermissionsDto {
 
     private String token;
 
-    private Long projectId;
-
-    private Long activityId;
+    private Long postId;
 
     private List<String> usernames;
 
@@ -26,20 +24,12 @@ public class UpdatePermissionsDto {
         this.token = token;
     }
 
-    public Long getProjectId() {
-        return projectId;
+    public Long getPostId() {
+        return postId;
     }
 
-    public void setProjectId(Long projectId) {
-        this.projectId = projectId;
-    }
-
-    public Long getActivityId() {
-        return activityId;
-    }
-
-    public void setActivityId(Long activityId) {
-        this.activityId = activityId;
+    public void setPostId(Long postId) {
+        this.postId = postId;
     }
 
     public List<String> getUsernames() {

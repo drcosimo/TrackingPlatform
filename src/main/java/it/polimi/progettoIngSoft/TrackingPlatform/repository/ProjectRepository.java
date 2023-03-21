@@ -17,4 +17,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Project getProjectById(Long idProject);
 
     public List<Project> getProjectByCreators(User user);
+
+    public Project findFirstByActivitiesContains(ActivityProject activityProject);
+
+
 }

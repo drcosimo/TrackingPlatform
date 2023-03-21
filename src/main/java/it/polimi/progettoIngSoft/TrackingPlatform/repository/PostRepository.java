@@ -23,4 +23,3 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     public Post getPostById(Long idPost);
 
 }
-
