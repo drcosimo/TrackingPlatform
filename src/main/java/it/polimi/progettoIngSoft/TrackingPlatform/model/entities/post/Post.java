@@ -41,6 +41,8 @@ public abstract class Post {
     @Column(nullable = false)
     private boolean visible = true;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     @ManyToMany
     @JoinTable(
@@ -191,5 +193,13 @@ public abstract class Post {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
