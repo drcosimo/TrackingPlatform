@@ -84,8 +84,7 @@ public abstract class Post {
     )
     private List<Reaction> reactions;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_post")
+    @OneToMany(mappedBy = "post")
     private List<Comment> comments;
 
     public Post() {

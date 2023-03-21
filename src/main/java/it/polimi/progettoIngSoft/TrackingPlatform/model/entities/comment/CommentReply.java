@@ -21,7 +21,12 @@ public class CommentReply {
 
     @ManyToOne
     @JoinColumn(name = "id_user")
-    private User user;
+    private User commentReplyCreator;
+
+    @ManyToOne
+    @JoinColumn(name ="id_comment")
+    private Comment comment;
+
 
     @Column(nullable = false)
     private String text;
@@ -31,6 +36,9 @@ public class CommentReply {
 
     @Column(nullable = false)
     private boolean visible = true;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     @PrePersist
     private void preSave() {
@@ -49,11 +57,11 @@ public class CommentReply {
     }
 
     public User getUser() {
-        return user;
+        return commentReplyCreator;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(User commentReplyCreator) {
+        this.commentReplyCreator = commentReplyCreator;
     }
 
     public String getText() {
@@ -78,5 +86,29 @@ public class CommentReply {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public User getCommentReplyCreator() {
+        return commentReplyCreator;
+    }
+
+    public void setCommentReplyCreator(User commentReplyCreator) {
+        this.commentReplyCreator = commentReplyCreator;
+    }
+
+    public Comment getComment() {
+        return comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
     }
 }
