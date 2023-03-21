@@ -21,7 +21,7 @@ public class CommentReply {
 
     @ManyToOne
     @JoinColumn(name = "id_user")
-    private User user;
+    private User commentReplyCreator;
 
     @Column(nullable = false)
     private String text;
@@ -49,11 +49,11 @@ public class CommentReply {
     }
 
     public User getUser() {
-        return user;
+        return commentReplyCreator;
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.commentReplyCreator = user;
     }
 
     public String getText() {
