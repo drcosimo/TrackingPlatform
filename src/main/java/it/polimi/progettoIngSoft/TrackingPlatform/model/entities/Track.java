@@ -1,17 +1,39 @@
 package it.polimi.progettoIngSoft.TrackingPlatform.model.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
+import org.geolatte.geom.GeometryType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+
+import javax.persistence.*;
+import java.sql.Time;
+import java.util.List;
 
 @Entity
-public abstract class Track {
+@TypeDef(name = "track", typeClass = GeometryType.class, defaultForType = LineString.class)
+
+public class Track {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_track")
     private Long id;
+
+    @Type(type="track")
+    @Column(nullable = false)
+    private LineString track;
+
+    @OneToMany(mappedBy="track")
+    private List<Place> places;
+
+    @ManyToOne
+    @JoinColumn(name="id_post")
+    private Post post;
+
+    public Track() {
+    }
 
     public Long getId() {
         return id;
@@ -19,5 +41,29 @@ public abstract class Track {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public LineString getTrack() {
+        return track;
+    }
+
+    public void setTrack(LineString track) {
+        this.track = track;
+    }
+
+    public List<Place> getPlaces() {
+        return places;
+    }
+
+    public void setPlaces(List<Place> places) {
+        this.places = places;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
     }
 }

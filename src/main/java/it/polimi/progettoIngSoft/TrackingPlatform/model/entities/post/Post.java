@@ -72,8 +72,7 @@ public abstract class Post {
     @JoinColumn(name = "id_post")
     private List<PostImage> postImages;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "id_post")
+    @OneToMany(mappedBy = "track")
     private List<Track> tracks;
 
     @ManyToMany
