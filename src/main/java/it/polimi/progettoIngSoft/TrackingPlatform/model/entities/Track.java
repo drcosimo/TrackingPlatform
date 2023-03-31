@@ -4,8 +4,11 @@ import it.polimi.progettoIngSoft.TrackingPlatform.model.entities.post.Post;
 import org.geolatte.geom.GeometryType;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
 import javax.persistence.*;
 import java.sql.Time;
@@ -21,9 +24,10 @@ public class Track {
     @Column(name = "id_track")
     private Long id;
 
-    @Type(type="track")
-    @Column(nullable = false)
+    @Type(type = "track")
+    @Column(name = "track", length = 10000)
     private LineString track;
+
 
     @OneToMany(mappedBy="track")
     private List<Place> places;
@@ -65,5 +69,14 @@ public class Track {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public Geometry wktToGeometry(String wellKnownText){
+
+        try {
+            return new WKTReader().read(wellKnownText);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
